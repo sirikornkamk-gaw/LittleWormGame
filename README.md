@@ -1,4 +1,4 @@
-# SnakeGame
+# LittleWormGame
 
 สิริกร คำกองแก้ว รหัส 6821601542
 
