@@ -1,4 +1,4 @@
-package models;
+package test.ModelsTest;
 
 public class GameBoard {
     
