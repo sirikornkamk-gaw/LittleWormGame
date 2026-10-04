@@ -1,9 +1,12 @@
 package views;
 import javax.swing.*;
 
+import config.GameConfig;
+
 
 public class MainFrame extends JFrame {
     private JLayeredPane layeredPane ;
+
     public MainFrame(){
        
 
@@ -20,7 +23,15 @@ public class MainFrame extends JFrame {
 
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setVisible(true);
-        switchView(new MainMenuPanel(this));
+        
+        GameConfig.loadSession();
+        if (!GameConfig.isLogin) {
+            switchView(new MainMenuPanel(this));
+        }else{
+            switchView(new MainMenuPanelAfterLogin(this));
+            
+        }
+        
 
         
     }
@@ -33,10 +44,12 @@ public class MainFrame extends JFrame {
         layeredPane.repaint();
     }
 
-    public void loinSuccess(String username,String score){
+    public void loginSuccess(String username,String score){
+        GameConfig.isLogin = true ;
         MainMenuPanelAfterLogin userMenuPanel = new MainMenuPanelAfterLogin(this);
-        userMenuPanel.ShowUserName(username);
-        userMenuPanel.ShowHighScore(score);
+        userMenuPanel.showUserName(username);
+        userMenuPanel.showHighScore(score);
         switchView(userMenuPanel);
     }
+
 }

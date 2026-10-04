@@ -11,6 +11,7 @@ import java.io.FileReader;
 
 public class LoginPanel extends JPanel implements ActionListener {
     private MainFrame mainFrame ;
+    private SignupPanel signupPage ;
     private GreenTagWarnning tagwarnning ;
     private JPanel cardContainer ;
     private JLabel ltitle1 , ltitle2 , llogin , lwarning ;
@@ -18,8 +19,11 @@ public class LoginPanel extends JPanel implements ActionListener {
     private JTextField tUser ;
     private JPasswordField pf ;
     
-    public LoginPanel(MainFrame mainFrame){
+
+    
+    public LoginPanel(MainFrame mainFrame, SignupPanel signupPage){
         this.mainFrame = mainFrame ;
+        this.signupPage = signupPage;
         setLayout(new GridBagLayout());
         setOpaque(false);
 
@@ -33,8 +37,10 @@ public class LoginPanel extends JPanel implements ActionListener {
                 super.paintComponent(g);
 
                 Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(GameConfig.PinkBG);
+                g2.setColor(GameConfig.GreenBlue);
                 g2.fillRect(0, 0, 600, 900);
+                g2.setColor(GameConfig.PinkBG);
+                g2.fillRect(5, 4, 590, 890);
                 AppleDrawer.RotateApple(g2, -68, 836, 235, 273, GameConfig.RedApple,14.43);
                 AppleDrawer.RotateApple(g2, 332, 810, 235, 273, GameConfig.GreenApple,-20.12);
                 AppleDrawer.RotateApple(g2, -84, 181, 93, 134, GameConfig.GreenApple,35.58);
@@ -54,10 +60,16 @@ public class LoginPanel extends JPanel implements ActionListener {
         tagwarnning = new GreenTagWarnning();
         tagwarnning.setBounds(0, 0, 600, 900);
         tagwarnning.setVisible(false);
+
+        signupPage = new SignupPanel();
+        signupPage.setVisible(false);
+        signupPage.setBounds(0, 0, 600, 900);
+
         
         
         layeredPane.add(cardContainer, JLayeredPane.DEFAULT_LAYER);
         layeredPane.add(tagwarnning, JLayeredPane.POPUP_LAYER);
+        layeredPane.add(signupPage, JLayeredPane.POPUP_LAYER);
 
         ltitle1 = new JLabel("Little Worm") ;
         ltitle1.setForeground(GameConfig.GreenBlue);
@@ -133,6 +145,14 @@ public class LoginPanel extends JPanel implements ActionListener {
 
         
     }
+    public void paintComponent(Graphics g){
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g ;
+
+        Color dimColor = new Color(0, 0, 0, 150);
+        g2.setColor(dimColor);
+        g2.fillRect(0, 0, getWidth(), getHeight());
+    }
 
     
 
@@ -162,11 +182,13 @@ public class LoginPanel extends JPanel implements ActionListener {
                         tagwarnning.ShowtagWarnning("Success!", "Welcome to\nlittle Worm Game!");
                         complete = true ;
                         this.setVisible(false);
-                        GameConfig.isLogin = true ;
-                        mainFrame.loinSuccess(Username, arr[2].trim());
+                        int userHighscore = Integer.parseInt(arr[2].trim());
+                        GameConfig.saveSession(true, Username,userHighscore);
+                        mainFrame.loginSuccess(Username, String.valueOf(userHighscore));
                         break;
                     }
                 }
+                
                 if (complete == false) {
                     tagwarnning.ShowtagWarnning("Failed!", "Invalid\nUsername or Password");
                     tagwarnning.setVisible(true);
@@ -175,7 +197,11 @@ public class LoginPanel extends JPanel implements ActionListener {
             } catch (Exception a) {
                 a.printStackTrace();
             }
+        }else if (e.getSource() == bsignup) {
+            this.setVisible(false);
+            signupPage.setVisible(true);
         }
+
     }
 
 }

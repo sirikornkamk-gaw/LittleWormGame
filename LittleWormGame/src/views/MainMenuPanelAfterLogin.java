@@ -102,13 +102,19 @@ public class MainMenuPanelAfterLogin extends  JPanel implements ActionListener{
         this.addComponentListener(new java.awt.event.ComponentAdapter() {
         @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
-                int actualWidth = getWidth(); // ดึงความกว้างจริงของ Panel ณ ตอนนั้น[cite: 6]
+                int actualWidth = getWidth(); 
                 int labelWidth = actualWidth - paddingRight;
-                luserN.setBounds(0, 24, labelWidth, 70); // ขยายกรอบให้พอดีขอบจอจริง[cite: 6]
+                luserN.setBounds(0, 24, labelWidth, 70);
             }
         });
 
         bstart.addActionListener(this);
+        blogout.addActionListener(this);
+
+        if (GameConfig.isLogin) {
+            showUserName(GameConfig.currentUser);
+            showHighScore(String.valueOf(GameConfig.highScore));
+        }
 
     }
 
@@ -118,11 +124,13 @@ public class MainMenuPanelAfterLogin extends  JPanel implements ActionListener{
         MenuClover.drawClover(g2);
     }
 
-    public void ShowHighScore(String highScore){
-        this.lscore.setText(highScore);
+    public void showHighScore(String highScore){
+        int score = Integer.parseInt(highScore);
+        String scoreText = String.format("%04d", score);
+        this.lscore.setText(scoreText);
     }
 
-    public void ShowUserName(String username){
+    public void showUserName(String username){
         this.luserN.setText(username);
     }
 
@@ -132,9 +140,16 @@ public class MainMenuPanelAfterLogin extends  JPanel implements ActionListener{
             if (GameConfig.isLogin == false) {
                 noLoginWarnnig.setVisible(true);
                 noLoginWarnnig.ShowtagWarnning("Notice!", "Please Log In\nFirst!");
+                
             }else{
-                mainFrame.switchView(new GamePanel());
+                mainFrame.switchView(new GamePanel(this.mainFrame));
             }
+        }else if (e.getSource() == blogout) {
+            GameConfig.clearSession();
+            MainMenuPanel mainMenuPanel = new MainMenuPanel(this.mainFrame);
+            mainFrame.switchView(mainMenuPanel);
+        }else if (e.getSource() == bcon) {
+            
         }
     }
 }

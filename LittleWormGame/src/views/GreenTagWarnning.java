@@ -16,8 +16,10 @@ public class GreenTagWarnning extends JPanel {
             public void paintComponent(Graphics g){
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g ;
-                g2.setColor(GameConfig.LightGreen);
+                g2.setColor(GameConfig.GreenBlue);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 100, 100);
+                g2.setColor(GameConfig.LightGreen);
+                g2.fillRoundRect(10, 8, 480, 380, 100, 100);
             }
         };
 
@@ -71,6 +73,14 @@ public class GreenTagWarnning extends JPanel {
             @Override
             public void mouseExited(MouseEvent e) {}
         });
+    }
+    public void paintComponent(Graphics g){
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g ;
+
+        Color dimColor = new Color(0, 0, 0, 150);
+        g2.setColor(dimColor);
+        g2.fillRect(0, 0, getWidth(), getHeight());
     }
 
     public void ShowtagWarnning(String title, String message){

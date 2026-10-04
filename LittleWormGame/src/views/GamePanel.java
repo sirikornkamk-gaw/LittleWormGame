@@ -1,26 +1,61 @@
 package views;
 import javax.swing.* ;
 import java.awt.* ;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 import config.GameConfig;
 
-public class GamePanel extends JPanel {
+public class GamePanel extends JPanel implements ActionListener,KeyListener{
     private WormDrawer wormDrawer ;
     private List<Point> Body ;
     private JLabel lscore ;
     private JButton bPause ;
     private Character currentDirection ;
     private Boolean isOpenMouth ;
-    public GamePanel(){
-        setLayout(null);
+    private PausePanel pausePage ;
+    private MainFrame mainFrame ;
+    private GameOverPanel gameOverPage ;
+    private GameWinPanel gameWinPage ;
+
+    public GamePanel(MainFrame mainFrame){
+        this.mainFrame = mainFrame ;
+        setLayout(new BorderLayout());
         setBackground(GameConfig.PinkBG);
 
-        lscore = new JLabel(getScore()) ;
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setLayout(null);
+
+        pausePage = new PausePanel(this.mainFrame,this);
+        pausePage.setVisible(false);
+        layeredPane.add(pausePage, JLayeredPane.POPUP_LAYER);
+
+        gameOverPage = new GameOverPanel(this.mainFrame,this);
+        gameOverPage.setVisible(false);
+        layeredPane.add(gameOverPage, JLayeredPane.POPUP_LAYER);
+
+        gameWinPage = new GameWinPanel(this.mainFrame,this);
+        gameWinPage.setVisible(false);
+        layeredPane.add(gameWinPage, JLayeredPane.POPUP_LAYER);
+
+        this.addComponentListener(new java.awt.event.ComponentAdapter() {
+        @Override
+        public void componentResized(java.awt.event.ComponentEvent e) {
+            layeredPane.setBounds(0, 0, getWidth(), getHeight());
+            pausePage.setBounds(0, 0, getWidth(), getHeight());
+            gameOverPage.setBounds(0, 0, getWidth(), getHeight());
+            gameWinPage.setBounds(0, 0, getWidth(), getHeight());
+            }
+        });
+
+        lscore = new JLabel("0000") ;
         lscore.setForeground(GameConfig.DarkerGreen);
         lscore.setFont(FontLoader.loadFont(GameConfig.Jersey_10, 96f));
         lscore.setBounds(190, 50, 150, 80);
-        add(lscore);
+        layeredPane.add(lscore);
 
         bPause = new RoundedButton("Pause", 50) ;
         bPause.setBackground(GameConfig.Beige);
@@ -28,19 +63,26 @@ public class GamePanel extends JPanel {
         bPause.setFont(FontLoader.loadFont(GameConfig.Jersey_10, 94f));
         bPause.setBounds(1559, 30, 281, 114);
         bPause.setFocusPainted(false);
-        add(bPause);
+        layeredPane.add(bPause);
 
         wormDrawer = new WormDrawer();
         Body = new ArrayList<>();
-        int size = GameConfig.tilesize;
-        int startX = 925 ;
-        int startY = 525 ;
-        for (int i = 0; i < 5; i++) {
-        Body.add(new Point(startX - (i * size), startY));
-        }
-        isOpenMouth = false ;
-        currentDirection = 'D';
 
+        resetGame();
+
+        add(layeredPane, BorderLayout.CENTER);
+
+        bPause.addActionListener(this);
+
+        setFocusable(true);
+        addKeyListener(this);
+        requestFocusInWindow();
+
+    }
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        requestFocusInWindow();
     }
 
     public void paintComponent(Graphics g){
@@ -66,8 +108,56 @@ public class GamePanel extends JPanel {
         wormDrawer.drawWorm(g2, Body, currentDirection, isOpenMouth);
     }
 
-    public String getScore(){
-        return "0000" ;
+    public void showScore(int score){
+        String scoreText = String.format("%04d", score);
+        this.lscore.setText(scoreText); 
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+       
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_W) {
+            gameWinPage.setVisible(true);
+            revalidate();
+            repaint();
+        }else if (e.getKeyCode() == KeyEvent.VK_O) {
+            gameOverPage.setVisible(true);
+            revalidate();
+            repaint();
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+       
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == bPause) {
+            pausePage.setVisible(true);
+        }
+    }
+
+    public void resetGame(){
+        Body.clear();
+
+        int size = GameConfig.tilesize;
+        int startX = 925 ;
+        int startY = 525 ;
+        for (int i = 0; i < 5; i++) {
+            Body.add(new Point(startX - (i * size), startY));
+        }
+        isOpenMouth = false ;
+        currentDirection = 'D';
+        showScore(0);
+
+        repaint();
+        requestFocusInWindow();
     }
 
 }

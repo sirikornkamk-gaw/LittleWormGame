@@ -1,5 +1,8 @@
 package config;
 import java.awt.* ;
+import java.io.*;
+
+
 
 public class GameConfig {
     //Color
@@ -26,9 +29,9 @@ public class GameConfig {
 
 
     //Font
-    public static final String Irish_Grover = "assets/font/IrishGrover-Regular.ttf";
-    public static final String Jersey_20 = "assets/font/Jersey20-Regular.ttf";
-    public static final String Jersey_10 = "assets/font/Jersey10-Regular.ttf";
+    public static final String Irish_Grover = "/assets/font/IrishGrover-Regular.ttf";
+    public static final String Jersey_20 = "/assets/font/Jersey20-Regular.ttf";
+    public static final String Jersey_10 = "/assets/font/Jersey10-Regular.ttf";
 
     //Size of Board
     public static final int tilesize = 70;
@@ -45,4 +48,43 @@ public class GameConfig {
     public static final String userData = "./userData/userData.txt" ;
 
     public static boolean isLogin = false ;
+    public static String currentUser = "" ;
+    public static int highScore = 0 ;
+    public static final String sessionFile = "userData/UserSession.txt" ;
+
+    public static void saveSession(boolean status, String username , int score){
+        isLogin = status ;
+        currentUser = username ;
+        highScore = score ;
+        
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(GameConfig.sessionFile))) {
+            bw.write(status + "," + username + "," +score);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void loadSession(){
+        try (BufferedReader br =new BufferedReader(new FileReader(GameConfig.sessionFile))) {
+            String line = br.readLine() ;
+            if (line != null && !line.trim().isEmpty()) {
+                String[] parts = line.split(",");
+                if (parts.length >= 3) {
+                    isLogin = Boolean.parseBoolean(parts[0]);
+                    currentUser = parts[1];
+                    highScore = Integer.parseInt(parts[2].trim());
+                }                
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public  static void clearSession(){
+        saveSession(false, "", 0);
+    }
+
+   
+
+
 }

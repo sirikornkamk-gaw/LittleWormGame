@@ -14,10 +14,8 @@ public class MainMenuPanel extends JPanel implements ActionListener{
 
     private LoginPanel loginPage ;
     private SignupPanel signupPage ;
-    private boolean isLogin ;
 
     public MainMenuPanel(MainFrame mainFrame){
-        isLogin = GameConfig.isLogin ; 
         this.mainFrame = mainFrame ;
         setLayout(new BorderLayout());
         setBackground(GameConfig.LightGreen);
@@ -29,14 +27,14 @@ public class MainMenuPanel extends JPanel implements ActionListener{
         noLoginWarnnig.setVisible(false);
         layeredPane.add(noLoginWarnnig, JLayeredPane.POPUP_LAYER);
 
-        loginPage = new LoginPanel(this.mainFrame);
-        loginPage.setVisible(false);
-        layeredPane.add(loginPage, JLayeredPane.DRAG_LAYER);
-
-
         signupPage = new SignupPanel();
         signupPage.setVisible(false);
         layeredPane.add(signupPage, JLayeredPane.POPUP_LAYER);
+
+        loginPage = new LoginPanel(this.mainFrame,this.signupPage);
+        loginPage.setVisible(false);
+        layeredPane.add(loginPage, JLayeredPane.DRAG_LAYER);
+
         
         this.addComponentListener(new java.awt.event.ComponentAdapter() {
         @Override
@@ -102,11 +100,11 @@ public class MainMenuPanel extends JPanel implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e) {
        if (e.getSource() == bstart) {
-        if (isLogin == false) {
+        if (GameConfig.isLogin == false) {
             noLoginWarnnig.setVisible(true);
             noLoginWarnnig.ShowtagWarnning("Notice!", "Please Log In\nFirst!");
         }else{
-            mainFrame.switchView(new GamePanel()) ;
+            mainFrame.switchView(new GamePanel(this.mainFrame)) ;
         }
             
        } else if (e.getSource() == blogin) {
