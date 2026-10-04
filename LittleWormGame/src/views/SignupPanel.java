@@ -4,12 +4,16 @@ import javax.swing.* ;
 import java.awt.* ;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
 
 import config.GameConfig;
 
 public class SignupPanel extends JPanel implements ActionListener {
-    private MainFrame mainFrame ;
     private JPanel cardContainer ;
+    private GreenTagWarnning tagwarnning ;
     JLabel ltitle1 , ltitle2 , lsignup  ;
     JButton bsignup, bquit ;
     JTextField tUser ;
@@ -27,8 +31,12 @@ public class SignupPanel extends JPanel implements ActionListener {
                 super.paintComponent(g);
 
                 Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(GameConfig.PinkBG);
+
+                g2.setColor(GameConfig.GreenBlue);
                 g2.fillRect(0, 0, 600, 900);
+                g2.setColor(GameConfig.PinkBG);
+                g2.fillRect(5, 4, 590, 890);
+
                 AppleDrawer.RotateApple(g2, -68, 836, 235, 273, GameConfig.RedApple,14.43);
                 AppleDrawer.RotateApple(g2, 332, 810, 235, 273, GameConfig.GreenApple,-20.12);
                 AppleDrawer.RotateApple(g2, -84, 181, 93, 134, GameConfig.GreenApple,35.58);
@@ -38,6 +46,20 @@ public class SignupPanel extends JPanel implements ActionListener {
         cardContainer.setLayout(null);
         cardContainer.setPreferredSize(new Dimension(600,900));
         cardContainer.setOpaque(false);
+        cardContainer.setBounds(0, 0, 600, 900);
+        cardContainer.addMouseListener(new java.awt.event.MouseAdapter() {});
+
+
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setLayout(null);
+        layeredPane.setPreferredSize(new Dimension(600,900));
+
+        tagwarnning = new GreenTagWarnning();
+        tagwarnning.setBounds(0, 0, 600, 900);
+        tagwarnning.setVisible(false);
+
+        layeredPane.add(cardContainer, JLayeredPane.DEFAULT_LAYER);
+        layeredPane.add(tagwarnning, JLayeredPane.POPUP_LAYER);
 
         ltitle1 = new JLabel("Little Worm") ;
         ltitle1.setForeground(GameConfig.GreenBlue);
@@ -96,17 +118,77 @@ public class SignupPanel extends JPanel implements ActionListener {
         gbc.gridx = 0 ;
         gbc.gridy = 0 ;
         gbc.anchor = GridBagConstraints.CENTER ;
-        add(cardContainer, gbc);
+        add(layeredPane, gbc);
 
         bquit.addActionListener(this);
+        bsignup.addActionListener(this);
+    }
+    public void paintComponent(Graphics g){
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g ;
+
+        Color dimColor = new Color(0, 0, 0, 150);
+        g2.setColor(dimColor);
+        g2.fillRect(0, 0, getWidth(), getHeight());
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        String Username = tUser.getText();
+        String password1 = new String(pf1.getPassword());
+        String password2 = new String(pf2.getPassword());
         if (e.getSource() == bquit) {
             this.setVisible(false);
         } else if (e.getSource() == bsignup) {
-            
+            if (Username.trim().isEmpty() || 
+            password1.trim().isEmpty() ||
+            password2.trim().isEmpty() ||
+            Username.equals(" Username") || 
+            password1.equals(" Password")||
+            password2.equals(" Password"
+            )) {
+                tagwarnning.ShowtagWarnning("Notice!", "Please Fill In\nAll Fields!");
+                tagwarnning.setVisible(true);
+                tagwarnning.getParent().revalidate();
+                tagwarnning.getParent().repaint();
+                return ;
+            }  
+            if (Username.length() >= 20) {
+                tagwarnning.ShowtagWarnning("Oops!", "User must\nbe <= 20 char!");
+                tagwarnning.setVisible(true);
+                return ;
+            }
+            if (!password1.equals(password2)) {
+                tagwarnning.ShowtagWarnning("Oops!", "Password\nDo not Match!");
+                tagwarnning.setVisible(true);
+                return ;
+            }
+            boolean complete = false ; 
+            try (BufferedReader br = new BufferedReader(new FileReader(GameConfig.userData))) {
+                String s ;
+                while ((s = br.readLine()) != null) {
+                    String arr[] = s.split(",");
+                    if (Username.equals(arr[0])) {
+                        tagwarnning.ShowtagWarnning("Oops!", "Username\nAlready taken!");
+                        tagwarnning.setVisible(true);
+                        complete = true ;
+                        break;
+                    }
+                }
+            } catch (Exception a) {
+                a.printStackTrace();
+            }
+            if (complete == false) {
+                try (BufferedWriter bw = new BufferedWriter(new FileWriter(GameConfig.userData,true))) {
+                    bw.write(Username+"," + password1 + "," + "0");
+                    bw.newLine();
+                } catch (Exception a2) {
+                a2.printStackTrace();
+                }
+                tagwarnning.ShowtagWarnning("Success!", "Account Created\nSuccessfully!");
+                tagwarnning.setVisible(true);
+                this.setVisible(false);
+            }
         }
     }
 }
