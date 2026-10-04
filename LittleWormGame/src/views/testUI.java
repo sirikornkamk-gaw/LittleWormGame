@@ -1,5 +1,5 @@
 package views;
- import javax.swing.*;
+import javax.swing.*;
 
 public class testUI {
    
@@ -9,7 +9,7 @@ public class testUI {
         frame.setUndecorated(true);
         // 1. อยากดู Panel ไหน เอามาวางตรงนี้เลย
         // frame.add(new MainMenuFrame()); 
-        frame.add(new GameWinPanel()); 
+        // frame.add(new GameWinPanel()); 
 
         frame.pack();
         frame.setLocationRelativeTo(null);
