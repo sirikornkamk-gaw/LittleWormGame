@@ -29,9 +29,9 @@ public class GameConfig {
 
 
     //Font
-    public static final String Irish_Grover = "assets/font/IrishGrover-Regular.ttf";
-    public static final String Jersey_20 = "assets/font/Jersey20-Regular.ttf";
-    public static final String Jersey_10 = "assets/font/Jersey10-Regular.ttf";
+    public static final String Irish_Grover = "/assets/font/IrishGrover-Regular.ttf";
+    public static final String Jersey_20 = "/assets/font/Jersey20-Regular.ttf";
+    public static final String Jersey_10 = "/assets/font/Jersey10-Regular.ttf";
 
     //Size of Board
     public static final int tilesize = 70;
