@@ -1,4 +1,4 @@
-import views.*;
+import views.MainFrame;
 
 public class Main {
 
