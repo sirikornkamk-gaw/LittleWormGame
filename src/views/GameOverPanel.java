@@ -101,7 +101,7 @@ public class GameOverPanel extends JPanel implements ActionListener {
             mainFrame.switchView(new MainMenuPanelAfterLogin(this.mainFrame));
         } else if(e.getSource() == btryagain){
             this.setVisible(false);
-            gamePanel.resetGame();
+            gamePanel.gameReset();
         }
     }
 

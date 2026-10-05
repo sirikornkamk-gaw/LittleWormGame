@@ -137,13 +137,15 @@ public class MainMenuPanelAfterLogin extends  JPanel implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == bstart) {
-            if (GameConfig.isLogin == false) {
-                noLoginWarnnig.setVisible(true);
-                noLoginWarnnig.ShowtagWarnning("Notice!", "Please Log In\nFirst!");
+            // if (GameConfig.isLogin == false) {
+            //     noLoginWarnnig.setVisible(true);
+            //     noLoginWarnnig.ShowtagWarnning("Notice!", "Please Log In\nFirst!");
                 
-            }else{
+            // }else{
+            //     mainFrame.switchView(new GamePanel(this.mainFrame));
+            // }
                 mainFrame.switchView(new GamePanel(this.mainFrame));
-            }
+
         }else if (e.getSource() == blogout) {
             GameConfig.clearSession();
             MainMenuPanel mainMenuPanel = new MainMenuPanel(this.mainFrame);

@@ -38,6 +38,8 @@ public class GameConfig {
     public static final int BOARD_WIDTH = 1750;
     public static final int BOARD_HEIGHT = 840;
 
+    public static final int despawnAppleSceond = 10;
+
     //ImagePath
     public static final String wormOpenMouth = "assets/image/WormOpenMouth.png";
     public static final String wormCloseMouth = "assets/image/WormCloseMouth.png";

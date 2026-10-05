@@ -107,7 +107,7 @@ public class MainMenuPanel extends JPanel implements ActionListener{
         //     mainFrame.switchView(new GamePanel(this.mainFrame)) ;
         // }
             
-            mainFrame.switchView(new GamePanel(this.mainFrame)) ;
+        mainFrame.switchView(new GamePanel(this.mainFrame)) ;
        } else if (e.getSource() == blogin) {
             loginPage.setVisible(true);
        } else if(e.getSource() == bsignup){

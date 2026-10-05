@@ -8,8 +8,19 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 import config.GameConfig;
+import models.Apple;
+import models.GameBoard;
+import models.Worm;
 
-public class GamePanel extends JPanel implements ActionListener,KeyListener{
+public class GamePanel extends JPanel implements ActionListener, KeyListener {
+
+    private GameBoard gameBoard;
+    // private Worm worm;
+    // private Apple apple;
+    private Timer timer;
+    private int current_score;
+    // private float second;
+
     private WormDrawer wormDrawer ;
     private List<Point> Body ;
     private JLabel lscore ;
@@ -21,7 +32,16 @@ public class GamePanel extends JPanel implements ActionListener,KeyListener{
     private GameOverPanel gameOverPage ;
     private GameWinPanel gameWinPage ;
 
+    
     public GamePanel(MainFrame mainFrame){
+        gameBoard = new GameBoard();
+        // worm = new Worm(5, 5);
+        // apple = new Apple(10, 5, 0);
+        timer = new Timer(100, this);
+        current_score = 0;
+        // second = 0;
+        timer.start();        
+
         this.mainFrame = mainFrame ;
         setLayout(new BorderLayout());
         setBackground(GameConfig.PinkBG);
@@ -68,17 +88,16 @@ public class GamePanel extends JPanel implements ActionListener,KeyListener{
         wormDrawer = new WormDrawer();
         Body = new ArrayList<>();
 
-        resetGame();
+        gameReset();
 
         add(layeredPane, BorderLayout.CENTER);
-
         bPause.addActionListener(this);
 
         setFocusable(true);
         addKeyListener(this);
         requestFocusInWindow();
-
     }
+    
     @Override
     public void addNotify() {
         super.addNotify();
@@ -106,6 +125,7 @@ public class GamePanel extends JPanel implements ActionListener,KeyListener{
             }
         }
         wormDrawer.drawWorm(g2, Body, currentDirection, isOpenMouth);
+        AppleDrawer.drawApple(g2, (gameBoard.getApple().getX() * tileSize) + 90, (gameBoard.getApple().getY() * tileSize) + 181, 41, 53, GameConfig.RedApple);
     }
 
     public void showScore(int score){
@@ -120,14 +140,34 @@ public class GamePanel extends JPanel implements ActionListener,KeyListener{
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_W) {
-            gameWinPage.setVisible(true);
-            revalidate();
-            repaint();
-        }else if (e.getKeyCode() == KeyEvent.VK_O) {
-            gameOverPage.setVisible(true);
-            revalidate();
-            repaint();
+        // if (e.getKeyCode() == KeyEvent.VK_W) {
+        //     gameWinPage.setVisible(true);
+        //     revalidate();
+        //     repaint();
+        // }else if (e.getKeyCode() == KeyEvent.VK_O) {
+        //     gameOverPage.setVisible(true);
+        //     revalidate();
+        //     repaint();
+        // }
+
+        if (e.getKeyCode() == KeyEvent.VK_UP && gameBoard.getWorm().getVelocityY() != 1) {
+            gameBoard.setWormDirection('W');
+            currentDirection = 'W';     
+        } else if (
+            e.getKeyCode() == KeyEvent.VK_DOWN && gameBoard.getWorm().getVelocityY() != -1
+        ) {
+            gameBoard.setWormDirection('S');
+            currentDirection = 'S';
+        } else if (
+            e.getKeyCode() == KeyEvent.VK_LEFT && gameBoard.getWorm().getVelocityX() != 1
+        ) {
+            gameBoard.setWormDirection('A');
+            currentDirection = 'A';
+        } else if (
+            e.getKeyCode() == KeyEvent.VK_RIGHT && gameBoard.getWorm().getVelocityX() != -1
+        ) {
+            gameBoard.setWormDirection('D');
+            currentDirection = 'D';
         }
     }
 
@@ -138,26 +178,67 @@ public class GamePanel extends JPanel implements ActionListener,KeyListener{
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        showScore(current_score);
         if (e.getSource() == bPause) {
             pausePage.setVisible(true);
+            gameStop();
         }
+
+        gameBoard.update();
+
+        if (gameBoard.getGameOver()) gameOver();
+        if (gameBoard.getGameWin()) gameWin();
+        if (gameBoard.getIsEatApple()) current_score++;
+        setBody();
+        repaint();
     }
 
-    public void resetGame(){
-        Body.clear();
+    public void gameStart() {
+        timer.start();
+    }
 
-        int size = GameConfig.tilesize;
-        int startX = 925 ;
-        int startY = 525 ;
-        for (int i = 0; i < 5; i++) {
-            Body.add(new Point(startX - (i * size), startY));
-        }
+    public void gameStop() {
+        timer.stop();
+    }
+
+    public void gameOver() {
+        timer.stop();
+        gameOverPage.setVisible(true);
+        revalidate();
+        repaint();
+    }
+
+    public void gameWin() {
+        timer.stop();
+        gameWinPage.setVisible(true);
+        revalidate();
+        repaint();
+    }
+
+    public void gameReset(){
+        gameBoard = new GameBoard();
+        Body.clear();
+        current_score = 0;
+        // second = 0;
+
+        setBody();
         isOpenMouth = false ;
         currentDirection = 'D';
         showScore(0);
 
+        gameStart();
         repaint();
         requestFocusInWindow();
+    }
+
+    public void setBody() {
+        int tileSize = GameConfig.tilesize;
+
+        Body.clear();
+        Body.add(new Point((gameBoard.getWorm().getX() * tileSize) + 86, (gameBoard.getWorm().getY() * tileSize) + 176));
+        for (int i = 0; i < gameBoard.getWorm().getBodySize(); i++) {
+            Body.add(new Point((gameBoard.getWorm().getBody().get(i).x * tileSize) + 86, (gameBoard.getWorm().getBody().get(i).y * tileSize) + 176));
+        }
     }
 
 }

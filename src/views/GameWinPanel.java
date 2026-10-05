@@ -106,7 +106,7 @@ public class GameWinPanel extends JPanel implements ActionListener{
 
         } else if(e.getSource() == bplayagain){
             this.setVisible(false);
-            gamePanel.resetGame();            
+            gamePanel.gameReset();            
         }
     }
 

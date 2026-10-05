@@ -105,9 +105,10 @@ public class PausePanel extends JPanel implements ActionListener{
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == bresume) {
             this.setVisible(false);
+            gamePanel.gameStart();
         } else if(e.getSource() == brestart){
             this.setVisible(false);
-            gamePanel.resetGame();
+            gamePanel.gameReset();
         } else if (e.getSource() == bquit) {
             mainFrame.switchView(new MainMenuPanelAfterLogin(mainFrame));
         }
