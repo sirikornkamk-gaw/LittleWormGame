@@ -1,6 +1,8 @@
 package views;
 import javax.swing.*;
 import config.GameConfig;
+import models.User;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,9 +21,10 @@ public class LoginPanel extends JPanel implements ActionListener {
     private JTextField tUser ;
     private JPasswordField pf ;
     
-
+    private User user;
     
     public LoginPanel(MainFrame mainFrame, SignupPanel signupPage){
+        user = new User();
         this.mainFrame = mainFrame ;
         this.signupPage = signupPage;
         setLayout(new GridBagLayout());
@@ -173,30 +176,42 @@ public class LoginPanel extends JPanel implements ActionListener {
                 tagwarnning.getParent().repaint();
                 return ;
             }
-            try (BufferedReader br = new BufferedReader(new FileReader(GameConfig.userData))) {
-                String s ;
-                boolean complete = false ;
-                while ((s = br.readLine()) != null) {
-                    String arr[] = s.split(",");
-                    if (Username.equals(arr[0]) && password.equals(arr[1])) {
-                        tagwarnning.ShowtagWarnning("Success!", "Welcome to\nlittle Worm Game!");
-                        complete = true ;
-                        this.setVisible(false);
-                        int userHighscore = Integer.parseInt(arr[2].trim());
-                        GameConfig.saveSession(true, Username,userHighscore);
-                        mainFrame.loginSuccess(Username, String.valueOf(userHighscore));
-                        break;
-                    }
-                }
-                
-                if (complete == false) {
-                    tagwarnning.ShowtagWarnning("Failed!", "Invalid\nUsername or Password");
-                    tagwarnning.setVisible(true);
-                }
-                br.close();
-            } catch (Exception a) {
-                a.printStackTrace();
+
+            boolean isAccountExist = user.loginAccount(Username, password);
+            if (isAccountExist) {
+                tagwarnning.ShowtagWarnning("Success!", "Welcome to\nlittle Worm Game!");
+                this.setVisible(false);
+                int userHighscore = Integer.parseInt(user.getScore());
+                GameConfig.saveSession(true, Username,userHighscore);
+                mainFrame.loginSuccess(Username, String.valueOf(userHighscore));
+            } else {
+
+                tagwarnning.ShowtagWarnning("Failed!", "Invalid\nUsername or Password");
+                tagwarnning.setVisible(true);
             }
+
+            // try (BufferedReader br = new BufferedReader(new FileReader(GameConfig.userData))) {
+            //     String s ;
+            //     boolean isAc = false ;
+            //     while ((s = br.readLine()) != null) {
+            //         String arr[] = s.split(",");
+            //         if (Username.equals(arr[0]) && password.equals(arr[1])) {
+            //             tagwarnning.ShowtagWarnning("Success!", "Welcome to\nlittle Worm Game!");
+            //             isAc = true ;
+            //             this.setVisible(false);
+            //             int userHighscore = Integer.parseInt(arr[2].trim());
+            //             GameConfig.saveSession(true, Username,userHighscore);
+            //             mainFrame.loginSuccess(Username, String.valueOf(userHighscore));
+            //             break;
+            //         }
+            //     }
+            // br.close();
+                
+                // if (isAccountExist == false) {
+                // }
+                // } catch (Exception a) {
+            //     a.printStackTrace();
+            // }
         }else if (e.getSource() == bsignup) {
             this.setVisible(false);
             signupPage.setVisible(true);

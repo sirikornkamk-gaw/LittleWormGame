@@ -10,16 +10,27 @@ import java.io.FileReader;
 import java.io.FileWriter;
 
 import config.GameConfig;
+import models.ReadFile;
+import models.User;
+import models.WriteFile;
 
 public class SignupPanel extends JPanel implements ActionListener {
     private JPanel cardContainer ;
     private GreenTagWarnning tagwarnning ;
-    JLabel ltitle1 , ltitle2 , lsignup  ;
-    JButton bsignup, bquit ;
-    JTextField tUser ;
-    JPasswordField pf1, pf2 ;
+    private JLabel ltitle1 , ltitle2 , lsignup  ;
+    private JButton bsignup, bquit ;
+    private JTextField tUser ;
+    private JPasswordField pf1, pf2 ;
+
+    // ReadFile rf;
+    // WriteFile wf;
+    private User user;
 
     public SignupPanel(){
+        // rf = new ReadFile();
+        // wf = new WriteFile();
+        user = new User();
+        
         setLayout(new GridBagLayout());
         setOpaque(false);
 
@@ -163,31 +174,21 @@ public class SignupPanel extends JPanel implements ActionListener {
                 tagwarnning.setVisible(true);
                 return ;
             }
-            boolean complete = false ; 
-            try (BufferedReader br = new BufferedReader(new FileReader(GameConfig.userData))) {
-                String s ;
-                while ((s = br.readLine()) != null) {
-                    String arr[] = s.split(",");
-                    if (Username.equals(arr[0])) {
-                        tagwarnning.ShowtagWarnning("Oops!", "Username\nAlready taken!");
-                        tagwarnning.setVisible(true);
-                        complete = true ;
-                        break;
-                    }
-                }
-            } catch (Exception a) {
-                a.printStackTrace();
-            }
-            if (complete == false) {
-                try (BufferedWriter bw = new BufferedWriter(new FileWriter(GameConfig.userData,true))) {
-                    bw.write(Username+"," + password1 + "," + "0");
-                    bw.newLine();
-                } catch (Exception a2) {
-                a2.printStackTrace();
-                }
+            boolean isAccountExist = user.isContainUsername(Username);
+            if (isAccountExist == true) {
+                tagwarnning.ShowtagWarnning("Oops!", "Username\nAlready taken!");
+                tagwarnning.setVisible(true);
+                tagwarnning.setVisible(true);
+
+            } else {
+            
+                user.createNewAccount(Username, password1);
                 tagwarnning.ShowtagWarnning("Success!", "Account Created\nSuccessfully!");
                 tagwarnning.setVisible(true);
-                this.setVisible(false);
+                tUser.setText("");
+                pf1.setText("");
+                pf2.setText("");
+                // this.setVisible(false);
             }
         }
     }

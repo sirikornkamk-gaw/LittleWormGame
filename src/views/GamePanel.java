@@ -8,18 +8,16 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 import config.GameConfig;
-import models.Apple;
 import models.GameBoard;
-import models.Worm;
+import models.User;
+import models.WriteFile;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     private GameBoard gameBoard;
-    // private Worm worm;
-    // private Apple apple;
     private Timer timer;
-    private int current_score;
-    // private float second;
+    private int currentScore;
+    private User user;
 
     private WormDrawer wormDrawer ;
     private List<Point> Body ;
@@ -35,11 +33,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     
     public GamePanel(MainFrame mainFrame){
         gameBoard = new GameBoard();
-        // worm = new Worm(5, 5);
-        // apple = new Apple(10, 5, 0);
         timer = new Timer(100, this);
-        current_score = 0;
-        // second = 0;
+        currentScore = 0;
+        user = new User();
         timer.start();        
 
         this.mainFrame = mainFrame ;
@@ -140,16 +136,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        // if (e.getKeyCode() == KeyEvent.VK_W) {
-        //     gameWinPage.setVisible(true);
-        //     revalidate();
-        //     repaint();
-        // }else if (e.getKeyCode() == KeyEvent.VK_O) {
-        //     gameOverPage.setVisible(true);
-        //     revalidate();
-        //     repaint();
-        // }
-
         if (e.getKeyCode() == KeyEvent.VK_UP && gameBoard.getWorm().getVelocityY() != 1) {
             gameBoard.setWormDirection('W');
             currentDirection = 'W';     
@@ -178,7 +164,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        showScore(current_score);
+        showScore(currentScore);
         if (e.getSource() == bPause) {
             pausePage.setVisible(true);
             gameStop();
@@ -188,7 +174,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         if (gameBoard.getGameOver()) gameOver();
         if (gameBoard.getGameWin()) gameWin();
-        if (gameBoard.getIsEatApple()) current_score++;
+        if (gameBoard.getIsEatApple()) currentScore++;
         setBody();
         repaint();
     }
@@ -203,6 +189,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     public void gameOver() {
         timer.stop();
+        if (currentScore > GameConfig.highScore)   
+            user.updateScore(GameConfig.currentUser, String.valueOf(currentScore));
         gameOverPage.setVisible(true);
         revalidate();
         repaint();
@@ -211,6 +199,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void gameWin() {
         timer.stop();
         gameWinPage.setVisible(true);
+        user.updateScore(GameConfig.currentUser, String.valueOf(currentScore));
         revalidate();
         repaint();
     }
@@ -218,13 +207,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void gameReset(){
         gameBoard = new GameBoard();
         Body.clear();
-        current_score = 0;
-        // second = 0;
+        currentScore = 0;
 
         setBody();
         isOpenMouth = false ;
         currentDirection = 'D';
-        showScore(0);
+        showScore(currentScore);
 
         gameStart();
         repaint();

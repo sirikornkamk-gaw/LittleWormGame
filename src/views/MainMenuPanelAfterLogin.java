@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import config.GameConfig;
+import models.User;
 
 public class MainMenuPanelAfterLogin extends  JPanel implements ActionListener{
     private MainFrame mainFrame ;
@@ -14,8 +15,11 @@ public class MainMenuPanelAfterLogin extends  JPanel implements ActionListener{
     private GreenTagWarnning tagWarnning ;
     private pinkTagWarnning noLoginWarnnig ;
 
+    private User user;
+
 
     public MainMenuPanelAfterLogin(MainFrame mainFrame){
+        user = new User();
         this.mainFrame = mainFrame ;
         setLayout(null);
         setBackground(GameConfig.LightGreen);
@@ -137,17 +141,16 @@ public class MainMenuPanelAfterLogin extends  JPanel implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == bstart) {
-            // if (GameConfig.isLogin == false) {
-            //     noLoginWarnnig.setVisible(true);
-            //     noLoginWarnnig.ShowtagWarnning("Notice!", "Please Log In\nFirst!");
+            if (GameConfig.isLogin == false) {
+                noLoginWarnnig.setVisible(true);
+                noLoginWarnnig.ShowtagWarnning("Notice!", "Please Log In\nFirst!");
                 
-            // }else{
-            //     mainFrame.switchView(new GamePanel(this.mainFrame));
-            // }
+            }else{
                 mainFrame.switchView(new GamePanel(this.mainFrame));
+            }
 
         }else if (e.getSource() == blogout) {
-            GameConfig.clearSession();
+            user.logoutAccount();
             MainMenuPanel mainMenuPanel = new MainMenuPanel(this.mainFrame);
             mainFrame.switchView(mainMenuPanel);
         }else if (e.getSource() == bcon) {
