@@ -185,7 +185,6 @@ public class LoginPanel extends JPanel implements ActionListener {
                 GameConfig.saveSession(true, Username,userHighscore);
                 mainFrame.loginSuccess(Username, String.valueOf(userHighscore));
             } else {
-
                 tagwarnning.ShowtagWarnning("Failed!", "Invalid\nUsername or Password");
                 tagwarnning.setVisible(true);
             }

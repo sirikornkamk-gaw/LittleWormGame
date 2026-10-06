@@ -10,7 +10,6 @@ import java.util.List;
 import config.GameConfig;
 import models.GameBoard;
 import models.User;
-import models.WriteFile;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
@@ -185,6 +184,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     public void gameStop() {
         timer.stop();
+    }
+    public void gameContinue() {
+        gameStart();
     }
 
     public void gameOver() {

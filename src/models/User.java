@@ -71,6 +71,7 @@ public class User {
         boolean isLoginSuccess = false;
             
         for (int i = 0; i < usernameList.size(); i++) {
+            System.out.println(usernameList.get(i) + ", " + passwordList.get(i));
             if (username.equals(usernameList.get(i)) && password.equals(passwordList.get(i))) {
                 setUsername(usernameList.get(i));
                 setPassword(passwordList.get(i));

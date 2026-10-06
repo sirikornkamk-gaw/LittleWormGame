@@ -98,7 +98,7 @@ public class GameBoard {
         }
     }
     
-    public void update () {
+    public void update() {
         setIsEatApple(false);
         worm.move();
         if (second - apple.getInitialSpawnTime() > GameConfig.despawnAppleSceond) addApple(second);

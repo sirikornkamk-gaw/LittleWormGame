@@ -113,6 +113,7 @@ public class MainMenuPanelAfterLogin extends  JPanel implements ActionListener{
         });
 
         bstart.addActionListener(this);
+        bcon.addActionListener(this);
         blogout.addActionListener(this);
 
         if (GameConfig.isLogin) {
@@ -146,15 +147,23 @@ public class MainMenuPanelAfterLogin extends  JPanel implements ActionListener{
                 noLoginWarnnig.ShowtagWarnning("Notice!", "Please Log In\nFirst!");
                 
             }else{
+                GameConfig.savedGamePanel = null;
                 mainFrame.switchView(new GamePanel(this.mainFrame));
             }
 
         }else if (e.getSource() == blogout) {
             user.logoutAccount();
+            GameConfig.savedGamePanel = null;
             MainMenuPanel mainMenuPanel = new MainMenuPanel(this.mainFrame);
             mainFrame.switchView(mainMenuPanel);
         }else if (e.getSource() == bcon) {
-            
+            GamePanel gamePanel = GameConfig.savedGamePanel ;
+            if (gamePanel == null) {
+                gamePanel = new GamePanel(this.mainFrame);
+            } else {
+                gamePanel.resumeGame();
+            }
+            mainFrame.switchView(gamePanel);
         }
     }
 }

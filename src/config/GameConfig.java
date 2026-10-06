@@ -2,6 +2,12 @@ package config;
 import java.awt.* ;
 import java.io.*;
 
+import javax.swing.JPanel;
+import javax.swing.Timer;
+
+import models.GameBoard;
+import views.GamePanel;
+
 
 
 public class GameConfig {
@@ -38,6 +44,7 @@ public class GameConfig {
     public static final int BOARD_WIDTH = 1750;
     public static final int BOARD_HEIGHT = 840;
 
+    // item 
     public static final int despawnAppleSceond = 10;
 
     //ImagePath
@@ -53,6 +60,8 @@ public class GameConfig {
     public static String currentUser = "" ;
     public static int highScore = 0 ;
     public static final String sessionFile = "userData/UserSession.txt" ;
+
+    public static GamePanel savedGamePanel ;
 
     public static void saveSession(boolean status, String username , int score){
         isLogin = status ;
@@ -85,8 +94,4 @@ public class GameConfig {
     public  static void clearSession(){
         saveSession(false, "", 0);
     }
-
-   
-
-
 }

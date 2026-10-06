@@ -28,12 +28,8 @@ public class MainFrame extends JFrame {
         if (!GameConfig.isLogin) {
             switchView(new MainMenuPanel(this));
         }else{
-            switchView(new MainMenuPanelAfterLogin(this));
-            
+            switchView(new MainMenuPanelAfterLogin(this));           
         }
-        
-
-        
     }
 
     public void switchView(JPanel newPanel){
