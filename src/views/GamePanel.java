@@ -185,12 +185,20 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void gameStop() {
         timer.stop();
     }
-    public void gameContinue() {
+
+    public void resumeGame() {
+        pausePage.setVisible(false);
+        gameOverPage.setVisible(false);
+        gameWinPage.setVisible(false);
+        revalidate();
+        repaint();
         gameStart();
+        requestFocusInWindow();
     }
 
     public void gameOver() {
         timer.stop();
+        GameConfig.savedGamePanel = null;
         if (currentScore > GameConfig.highScore)   
             user.updateScore(GameConfig.currentUser, String.valueOf(currentScore));
         gameOverPage.setVisible(true);
@@ -200,6 +208,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     public void gameWin() {
         timer.stop();
+        GameConfig.savedGamePanel = null;
         gameWinPage.setVisible(true);
         user.updateScore(GameConfig.currentUser, String.valueOf(currentScore));
         revalidate();
@@ -216,6 +225,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         currentDirection = 'D';
         showScore(currentScore);
 
+        GameConfig.savedGamePanel = this;
         gameStart();
         repaint();
         requestFocusInWindow();
