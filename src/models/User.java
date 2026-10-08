@@ -1,4 +1,5 @@
 // remove the password out of this file and call the function if we will to access the password
+// try to not collect the usernamelist and scorelist. just use a function that we wrtei on other file like rf or wf
 
 package models;
 
