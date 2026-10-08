@@ -1,4 +1,5 @@
 package views;
+
 import javax.swing.* ;
 import java.awt.* ;
 import java.awt.event.ActionEvent;
@@ -9,12 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 import config.GameConfig;
 import models.GameBoard;
+import models.Item;
+import models.SpeedPotion;
 import models.User;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     private GameBoard gameBoard;
     private Timer timer;
+    private Timer timerSpeedUp;
     private int currentScore;
     private User user;
 
@@ -23,19 +27,29 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private JLabel lscore ;
     private JButton bPause ;
     private Character currentDirection ;
-    private Boolean isOpenMouth ;
     private PausePanel pausePage ;
     private MainFrame mainFrame ;
     private GameOverPanel gameOverPage ;
     private GameWinPanel gameWinPage ;
 
+    private boolean isKeyPress;
+    private boolean isSpeedIncrease;
+    private int speedIncreaseCurrentTimer;
+    private int speedIncreaseCooldown;
+
     
     public GamePanel(MainFrame mainFrame){
         gameBoard = new GameBoard();
         timer = new Timer(100, this);
+        timerSpeedUp = new Timer(50, this);
         currentScore = 0;
         user = new User();
-        timer.start();        
+        timer.start();
+
+        isKeyPress = false;
+        isSpeedIncrease = false;
+        speedIncreaseCurrentTimer = 0;
+        speedIncreaseCooldown = 10;
 
         this.mainFrame = mainFrame ;
         setLayout(new BorderLayout());
@@ -119,8 +133,18 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 g2.fillRect(85 + (i *tileSize), 176 + (j * tileSize) , tileSize, tileSize);
             }
         }
-        wormDrawer.drawWorm(g2, Body, currentDirection, isOpenMouth);
-        AppleDrawer.drawApple(g2, (gameBoard.getApple().getX() * tileSize) + 90, (gameBoard.getApple().getY() * tileSize) + 181, 41, 53, GameConfig.RedApple);
+        wormDrawer.drawWorm(g2, Body, currentDirection, gameBoard.getIsMonthOpen());
+        for (int i = 0; i < gameBoard.getItems().size(); i++) {
+            Item thisItem = gameBoard.getItem(i);
+            if (thisItem.getType() == "apple")
+                AppleDrawer.drawApple(g2, (thisItem.getX() * tileSize) + 90, (thisItem.getY() * tileSize) + 181, 41, 53, GameConfig.RedApple);
+            if (thisItem.getType() == "goldApple")
+                AppleDrawer.drawApple(g2, (thisItem.getX() * tileSize) + 90, (thisItem.getY() * tileSize) + 181, 41, 53, GameConfig.Yellow);
+            if (thisItem.getType() == "speedPotion")
+                ItemDrawer.drawSpeedItem(g2, (thisItem.getX() * tileSize) + 90, (thisItem.getY() * tileSize) + 181, 41, 53);
+            if (thisItem.getType() == "poison")
+                ItemDrawer.drawPoisonItem(g2, (thisItem.getX() * tileSize) + 90, (thisItem.getY() * tileSize) + 181, 41, 53);
+        }
     }
 
     public void showScore(int score){
@@ -135,30 +159,33 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_UP && gameBoard.getWorm().getVelocityY() != 1) {
+
+        if (e.getKeyCode() == KeyEvent.VK_UP && gameBoard.getWorm().getVelocityY() != 1 && isKeyPress == false) {
             gameBoard.setWormDirection('W');
             currentDirection = 'W';     
         } else if (
-            e.getKeyCode() == KeyEvent.VK_DOWN && gameBoard.getWorm().getVelocityY() != -1
+            e.getKeyCode() == KeyEvent.VK_DOWN && gameBoard.getWorm().getVelocityY() != -1 && isKeyPress == false
         ) {
             gameBoard.setWormDirection('S');
             currentDirection = 'S';
         } else if (
-            e.getKeyCode() == KeyEvent.VK_LEFT && gameBoard.getWorm().getVelocityX() != 1
+            e.getKeyCode() == KeyEvent.VK_LEFT && gameBoard.getWorm().getVelocityX() != 1 && isKeyPress == false
         ) {
             gameBoard.setWormDirection('A');
             currentDirection = 'A';
         } else if (
-            e.getKeyCode() == KeyEvent.VK_RIGHT && gameBoard.getWorm().getVelocityX() != -1
+            e.getKeyCode() == KeyEvent.VK_RIGHT && gameBoard.getWorm().getVelocityX() != -1 && isKeyPress == false
         ) {
             gameBoard.setWormDirection('D');
             currentDirection = 'D';
         }
+
+        isKeyPress = true;
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-       
+       isKeyPress = false;
     }
 
     @Override
@@ -171,11 +198,45 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         gameBoard.update();
 
+        if (isSpeedIncrease) {
+            speedIncreaseCurrentTimer++;
+            
+            if (speedIncreaseCurrentTimer >= speedIncreaseCooldown) {
+                speedIncreaseCurrentTimer = 0;
+                isSpeedIncrease = false;
+                timer.start();
+                timerSpeedUp.stop();
+            }
+        }
+        
         if (gameBoard.getGameOver()) gameOver();
         if (gameBoard.getGameWin()) gameWin();
-        if (gameBoard.getIsEatApple()) currentScore++;
+        if (gameBoard.getIsEatApple()) {
+            if (gameBoard.getIsEatAppleType().equals("apple"))
+                currentScore++;
+
+            else if (gameBoard.getIsEatAppleType().equals("goldApple"))
+                currentScore += 3;
+            
+            else if (gameBoard.getIsEatAppleType().equals("speedPotion"))
+                    {
+                        timer.stop();
+                        timerSpeedUp.start();
+                        isSpeedIncrease = true;
+                    }
+            
+            else if (gameBoard.getIsEatAppleType().equals("poison"))
+                currentScore--;
+
+            if (gameBoard.getAmountEatItem() != 0 && gameBoard.getAmountEatItem() % 5 == 0) {
+                gameBoard.getWorm().addTail();
+            }
+        }
+        
+        
         setBody();
         repaint();
+        isKeyPress = false;
     }
 
     public void gameStart() {
@@ -220,8 +281,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         Body.clear();
         currentScore = 0;
 
+        isKeyPress = false;
+        isSpeedIncrease = false;
+        speedIncreaseCurrentTimer = 0;
+
         setBody();
-        isOpenMouth = false ;
         currentDirection = 'D';
         showScore(currentScore);
 
