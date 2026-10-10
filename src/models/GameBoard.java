@@ -7,6 +7,10 @@ import java.util.Random;
 import config.GameConfig;
 
 public class GameBoard {
+    private final int boardWidth = GameConfig.BOARD_WIDTH / GameConfig.tilesize;
+    private final int boardHeight = GameConfig.BOARD_HEIGHT / GameConfig.tilesize;
+    private final int despawnAppleSecond = GameConfig.despawnAppleSceond;
+
     private Worm worm;
     private ArrayList<Item> items;
     private float second;
@@ -14,11 +18,12 @@ public class GameBoard {
     private Random random;
     private boolean gameOver;
     private boolean gameWin;
-    private boolean isEatApple;
-    private String isEatAppleType;
+    private boolean isEatItem;
+    private String isEatItemType;
     private boolean isMonthOpen;
     private int isMonthOpenFrame;
     private int amountEatItem;
+    private boolean isSpeedUp;
     
     public GameBoard() {
         random = new Random();
@@ -27,28 +32,92 @@ public class GameBoard {
         items = new ArrayList<>();
 
         
-        addItem("apple", second);
-        addItem("apple", second);
+        addItem(getSecond());
+        addItem(getSecond());
+        addItem(getSecond());
+        addItem(getSecond());
+        addItem(getSecond());
+        addItem(getSecond());
+        addItem(getSecond());
+        addItem(getSecond());
         
-        addItem("goldApple", second);
-        addItem("goldApple", second);
-        
-        addItem("speedPotion", second);
-        addItem("speedPotion", second);
-        
-        
-        addItem("poison", second);
-        addItem("poison", second);
-        
-        isEatApple = false;
-        isEatAppleType = "";
-        amountEatItem = 0;
+        isEatItem = false;
+        setAmountEatItem(0);
         isMonthOpen = false;
-        isMonthOpenFrame = 0;
-        second = 0;
-
+        setIsMonthOpenFrame(0);
+        isSpeedUp = false;
+        setSecond(0);
+        
         setGameOver(false);
         setGameWin(false);
+        checkRep();
+    }
+
+    public void checkRep() {
+        assert worm != null : "worm is null";
+        assert items != null : "items is null";
+        assert random != null : "random is null";
+
+        assert !items.isEmpty() : "items is empty";
+        assert second >= 0 : "second is negative: " + second;
+        assert amountEatItem >= 0 : "amountEatItem is negative: " + amountEatItem;
+        // animation worm open the month. 
+        // true if the worm eat item and after that 3 frame the month will close.
+        // isMonthOpenFrame collect the current frame that have been pass if the frame is more than 2 worm month will close and go to false.
+        assert isMonthOpenFrame >= 0 && isMonthOpenFrame <= 2
+                : "isMonthOpenFrame out of range: " + isMonthOpenFrame;
+
+        // use for tell what is worm eat (apple, goldapple. speedpotion, posion)
+        if (isEatItem) {
+            assert isEatItemType != null : "isEatItemType is null";
+            assert isEatItemType.isEmpty() || isEatItemType.equals("apple")
+                    || isEatItemType.equals("goldApple")
+                    || isEatItemType.equals("speedPotion")
+                    || isEatItemType.equals("poison")
+                    : "invalid isEatItemType: " + isEatItemType;
+        }
+
+        for (int i = 0; i < items.size(); i++) {
+            Item it = items.get(i);
+            assert it != null : "item " + i + " is null";
+            assert it.getX() >= 0 && it.getX() < boardWidth
+                    && it.getY() >= 0 && it.getY() < boardHeight
+                    : "item " + i + " out of board";
+
+            for (int j = i + 1; j < items.size(); j++) {
+                assert !collision(items.get(j).getX(), items.get(j).getY(), it.getX(), it.getY())
+                        : "items " + i + " and " + j + " overlap";
+            }
+
+            assert !collision(worm.getX(), worm.getY(), it.getX(), it.getY())
+                    : "item " + i + " overlaps worm head";
+            for (Point body : worm.getBody()) {
+                assert !collision(body.x, body.y, it.getX(), it.getY())
+                        : "item " + i + " overlaps worm body";
+            }
+        }
+
+        if (gameOver) {
+            boolean isOutOfBoard = worm.getX() < 0
+                    || worm.getX() >= boardWidth
+                    || worm.getY() < 0
+                    || worm.getY() >= boardHeight;
+
+            boolean isSelfCollision = false;
+            for (Point body : worm.getBody()) {
+                if (collision(worm.getX(), worm.getY(), body.x, body.y)) {
+                    isSelfCollision = true;
+                }
+            }
+
+            assert isOutOfBoard || isSelfCollision
+                    : "gameOver is true but worm is inside the board and not self-overlapping";
+        }
+
+        if (gameWin) {
+            assert worm.getBodySize() == boardWidth * boardHeight
+                    : "gameWin flag but board is not full";
+        }
     }
 
     public Worm getWorm() {
@@ -86,19 +155,19 @@ public class GameBoard {
     }
  
     public void setIsEatItem(boolean value) {
-        this.isEatApple = value;
+        this.isEatItem = value;
     }
 
-    public boolean getIsEatApple() {
-        return isEatApple;
+    public boolean getIsEatItem() {
+        return isEatItem;
     }
 
-    public void setIsEatAppleType (String value) {
-        this.isEatAppleType  = value;
+    public void setIsEatItemType (String value) {
+        this.isEatItemType  = value;
     }
 
-    public String getIsEatAppleType () {
-        return isEatAppleType ;
+    public String getIsEatItemType () {
+        return isEatItemType ;
     }
 
     public void setIsMonthOpen(boolean value) {
@@ -109,20 +178,54 @@ public class GameBoard {
         return isMonthOpen;
     }
 
+    public boolean getIsSpeedUp() {
+        return isSpeedUp;
+    }
+
+    public void setIsSpeedUp(boolean value) {
+        this.isSpeedUp = value;
+        checkRep();
+    }
+
     public int getAmountEatItem() {
         return amountEatItem;
     }
 
+    public void setAmountEatItem(int value) {
+        if (value < 0) throw new IllegalArgumentException();
+        this.amountEatItem = value;
+    }
 
-    public void addItem(String type, float initialSpawnTime) {
+    public float getSecond() {
+        return second;
+    }
+
+    public void setSecond(float value) {
+        if (value < 0) throw new IllegalArgumentException();
+        this.second = value;
+    }
+
+    public int getIsMonthOpenFrame() {
+        return isMonthOpenFrame;
+    }
+
+    public void setIsMonthOpenFrame(int value) {
+        if (isMonthOpenFrame > 2) throw new IllegalArgumentException();
+        this.isMonthOpenFrame = value;
+    }
+
+
+    public void addItem(float initialSpawnTime) {
         int x;
         int y;
         boolean isCollisionWormBody;
+        boolean isCollisionItem;
 
         while (true) {
-            x = random.nextInt(GameConfig.BOARD_WIDTH / GameConfig.tilesize);
-            y = random.nextInt(GameConfig.BOARD_HEIGHT / GameConfig.tilesize);
+            x = random.nextInt(boardWidth);
+            y = random.nextInt(boardHeight);
             isCollisionWormBody = false;
+            isCollisionItem = false;
 
             if (collision(worm.getX(), worm.getY(), x, y)) {
                 isCollisionWormBody = true;
@@ -133,23 +236,28 @@ public class GameBoard {
                 }
             }
 
-            if (isCollisionWormBody == false) break;
+            for (int i = 0; i < items.size(); i++) {
+                if (collision(items.get(i).x, items.get(i).y, x, y)) {
+                    isCollisionItem = true;
+                }
+            }
+
+
+            if (isCollisionWormBody == false && isCollisionItem == false) break;
         }
 
-        if (type.equals("apple"))
+        int randomItemType = random.nextInt(4);
+        if (randomItemType == 0)
             items.add(new Apple(x, y, initialSpawnTime));
 
-        if (type.equals("goldApple"))
+        if (randomItemType == 1)
             items.add(new GoldApple(x, y, initialSpawnTime));
 
-        if (type.equals("speedPotion"))
+        if (randomItemType == 2)
             items.add(new SpeedPotion(x, y, initialSpawnTime));
-
             
-        if (type.equals("poison"))
+        if (randomItemType == 3)
             items.add(new Poison(x, y, initialSpawnTime));
-
-
         
     }
 
@@ -158,65 +266,68 @@ public class GameBoard {
             String type = items.get(index).getType();
             setIsEatItem(true);
             setIsMonthOpen(true);
-            amountEatItem++;
+            setAmountEatItem(getAmountEatItem() + 1);
             items.remove(index);
-            addItem(type, second);
-            setIsEatAppleType(type);
+            addItem(getSecond());
+            setIsEatItemType(type);
         }
     }
     
     public void update() {
-        isEatApple = false;
-        isEatAppleType = "";
+        
+        isEatItem = false;
+        isEatItemType = "";
 
         if (isMonthOpen) {
-            isMonthOpenFrame++;
+            setIsMonthOpenFrame(getIsMonthOpenFrame() + 1);
         }
 
-        if (isMonthOpenFrame >= 2) {
+        if (getIsMonthOpenFrame() >= 2) {
             isMonthOpen = false;
-            isMonthOpenFrame = 0;
+            setIsMonthOpenFrame(0);
         }
 
         worm.move();
-
+        
         for (int i = 0; i < items.size(); i++) {
-            if (second - items.get(i).getInitialSpawnTime() > GameConfig.despawnAppleSceond) {   
-                String type = items.get(i).getType();
-                
+            if (getSecond() - items.get(i).getInitialSpawnTime() > despawnAppleSecond) {   
                 items.remove(i);
-                addItem(type, second);
+                addItem(getSecond());
             }
             eatItem(i);
         }
         
         isGameOver();
         isGameWin();
-        second += 0.1;
+
+        if (isSpeedUp)
+            setSecond(getSecond() + (float)0.05);
+        else 
+            setSecond(getSecond() + (float)0.1);
+        checkRep();
     }
 
     public boolean collision(int x1, int y1, int x2, int y2) {
         return x1 == x2 && y1 == y2;
     }
-    
+
+
     public void reset() {
         worm = new Worm(5, 5);
 
-        addItem("apple", second);
-        addItem("apple", second);
+        addItem(getSecond());
+        addItem(getSecond());
+        addItem(getSecond());
+        addItem(getSecond());
+        addItem(getSecond());
+        addItem(getSecond());
+        addItem(getSecond());
+        addItem(getSecond());
 
-        addItem("goldApple", second);
-        addItem("goldApple", second);
-
-        addItem("speedPotion", second);
-        addItem("speedPotion", second);
-
-        addItem("poison", second);
-        addItem("poison", second);
-        
-        second = 0;
+        setSecond(0);
         setGameOver(false);
         setGameWin(false);
+        checkRep();
     }
 
     public void setGameOver(boolean value) {
@@ -228,12 +339,19 @@ public class GameBoard {
     }
 
     public void isGameOver() {
-        if (
-            worm.getX() < 0 || 
-            worm.getX() >= GameConfig.BOARD_WIDTH / GameConfig.tilesize || 
-            worm.getY() < 0 || 
-            worm.getY() >= GameConfig.BOARD_HEIGHT / GameConfig.tilesize) 
+        if (worm.getX() < 0) {
             setGameOver(true);
+
+        } else if (worm.getX() > boardWidth) {
+            setGameOver(true);
+        } 
+        else if (worm.getY() < 0) {
+            setGameOver(true);
+        }
+        else if (worm.getY() > boardHeight) {
+            setGameOver(true);
+        }
+        
         for (Point body : worm.getBody()) {
             if (collision(worm.getX(), worm.getY(), (int)body.getX(),(int)body.getY())) {
                 setGameOver(true);
@@ -250,12 +368,6 @@ public class GameBoard {
     }
 
     public void isGameWin() {
-        int boardWidth = GameConfig.BOARD_WIDTH / GameConfig.tilesize;
-        int boardHeight = GameConfig.BOARD_HEIGHT / GameConfig.tilesize;
         if (worm.getBody().size() == boardWidth * boardHeight) setGameWin(true);
-        
-        
-        // testing only
-        // if (worm.getBody().size() == 6) setGameWin(true);
     }   
 }

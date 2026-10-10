@@ -151,13 +151,16 @@ public class SignupPanel extends JPanel implements ActionListener {
         if (e.getSource() == bquit) {
             this.setVisible(false);
         } else if (e.getSource() == bsignup) {
-            if (Username.trim().isEmpty() || 
-            password1.trim().isEmpty() ||
-            password2.trim().isEmpty() ||
-            Username.equals(" Username") || 
-            password1.equals(" Password")||
-            password2.equals(" Password"
-            )) {
+            // if (Username.trim().isEmpty() || 
+            // password1.trim().isEmpty() ||
+            // password2.trim().isEmpty() ||
+            // Username.equals(" Username") || 
+            // password1.equals(" Password")||
+            // password2.equals(" Password"
+            // ))
+            boolean isAccountVaild = user.isUsernameAndPasswordVaild(Username, password1);
+            if (!isAccountVaild)  
+        {
                 tagwarnning.ShowtagWarnning("Notice!", "Please Fill In\nAll Fields!");
                 tagwarnning.setVisible(true);
                 tagwarnning.getParent().revalidate();

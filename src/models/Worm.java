@@ -1,14 +1,19 @@
 package models;
-import java.util.List;
+
+
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import config.GameConfig;
 
-import java.util.ArrayList;
 import java.awt.Point;
 
-import java.util.ArrayList;
 
 public class Worm {
+
+    private final int boardWidth = GameConfig.BOARD_WIDTH / GameConfig.tilesize;
+    private final int boardHeight = GameConfig.BOARD_HEIGHT / GameConfig.tilesize;
+    private final int boardAllTile = boardWidth * boardHeight;
 
     private int x;
     private int y;
@@ -31,7 +36,8 @@ public class Worm {
         bodys.add(new Point(x - 3, y));
     }
 
-    // public void checkRep() {}
+    public void checkRep() {
+    }
 
     public int getX() {
         return this.x;
@@ -43,13 +49,10 @@ public class Worm {
 
     public void setX(int x) {
         this.x = x;
-        // checkRep();
     }
 
     public void setY(int y) {
         this.y = y;
-
-        // checkRep();
     }
 
     public int getVelocityX() {
@@ -61,13 +64,13 @@ public class Worm {
     }
 
     public void setVelocityX(int x) {
+        if ( x < -1 || x > 1 ) throw new IllegalArgumentException();
         this.velocityX = x;
-        // checkRep();
     }
 
     public void setVelocityY(int y) {
+        if ( y < -1 || y > 1 ) throw new IllegalArgumentException();
         this.velocityY = y;
-        // checkRep();
     }
 
     public ArrayList<Point> getBody() {
@@ -80,36 +83,23 @@ public class Worm {
     
     public int getBodySize() {
         return bodys.size();
-        // checkRep();
     }
 
     public void setBody(int x, int y, int index) {
         bodys.set(index, new Point(x, y));
-        // checkRep();
     }
 
 
     public void move() {
-        int pre_x = 0;
-        int pre_y = 0;
-        int current_index = 0;
-
-        for (Point position : bodys) {
-            if (current_index == 0) {
-                setBody(getX(), getY(), current_index);
-                pre_x = position.x;
-                pre_y = position.y;
-                current_index++;
-            } else {
-                setBody(pre_x, pre_y, current_index);
-                pre_x = position.x;
-                pre_y = position.y;
-                current_index++;
-            }
+        for (int i = bodys.size() - 1; i > 0; i--) {
+            Point prev = bodys.get(i - 1);
+            bodys.set(i, new Point(prev.x, prev.y));
         }
+        bodys.set(0, new Point(getX(), getY()));
 
         setX(getX() + getVelocityX());
         setY(getY() + getVelocityY());
+        checkRep();
     }
 
     public Point getLastBody() {
@@ -118,6 +108,7 @@ public class Worm {
     }
 
     public void addTail() {
+        if (boardAllTile - 1 == getBodySize()) throw new IllegalArgumentException();
         bodys.add(getLastBody());
     }
 }

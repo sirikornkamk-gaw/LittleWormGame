@@ -3,6 +3,7 @@ package models;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import config.GameConfig;
 
@@ -15,6 +16,32 @@ public class ReadFile {
 
     public ReadFile() {
         update();
+    }
+
+    public void update() {
+        accounts = new ArrayList<>();
+        usernames = new ArrayList<>();
+        passwords = new ArrayList<>();
+        scores = new ArrayList<>();
+
+        readAllAccount();
+        checkRep();
+    }
+
+    public void checkRep() {
+        assert path != null : "path is null";
+        assert accounts != null && usernames != null
+                && passwords != null && scores != null : "lists are null";
+        assert accounts.size() == usernames.size()
+                && usernames.size() == passwords.size()
+                && passwords.size() == scores.size() : "parallel lists out of sync";
+
+        HashSet<String> seenUsernames = new HashSet<>();
+
+        for (int i = 0; i < usernames.size(); i++) {
+            assert seenUsernames.add(usernames.get(i))
+                    : "username already exists: " + usernames.get(i);
+        }
     }
     
     public void readAllAccount() {
@@ -74,12 +101,4 @@ public class ReadFile {
         return isContain;
     }
     
-    public void update() {
-        accounts = new ArrayList<>();
-        usernames = new ArrayList<>();
-        passwords = new ArrayList<>();
-        scores = new ArrayList<>();
-
-        readAllAccount();
-    }
 }

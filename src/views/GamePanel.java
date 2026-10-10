@@ -11,7 +11,6 @@ import java.util.List;
 import config.GameConfig;
 import models.GameBoard;
 import models.Item;
-import models.SpeedPotion;
 import models.User;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
@@ -20,6 +19,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private Timer timer;
     private Timer timerSpeedUp;
     private int currentScore;
+    private boolean isKeyPress;
+    private int speedIncreaseCurrentTimer;
+    private int speedIncreaseCooldown;
     private User user;
 
     private WormDrawer wormDrawer ;
@@ -32,10 +34,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private GameOverPanel gameOverPage ;
     private GameWinPanel gameWinPage ;
 
-    private boolean isKeyPress;
-    private boolean isSpeedIncrease;
-    private int speedIncreaseCurrentTimer;
-    private int speedIncreaseCooldown;
 
     
     public GamePanel(MainFrame mainFrame){
@@ -47,7 +45,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         timer.start();
 
         isKeyPress = false;
-        isSpeedIncrease = false;
+        gameBoard.setIsSpeedUp(false);
         speedIncreaseCurrentTimer = 0;
         speedIncreaseCooldown = 10;
 
@@ -141,9 +139,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             if (thisItem.getType() == "goldApple")
                 AppleDrawer.drawApple(g2, (thisItem.getX() * tileSize) + 90, (thisItem.getY() * tileSize) + 181, 41, 53, GameConfig.Yellow);
             if (thisItem.getType() == "speedPotion")
-                ItemDrawer.drawSpeedItem(g2, (thisItem.getX() * tileSize) + 90, (thisItem.getY() * tileSize) + 181, 41, 53);
+                ItemDrawer.drawSpeedItem(g2, (thisItem.getX() * tileSize) + 100, (thisItem.getY() * tileSize) + 181, 41, 53);
             if (thisItem.getType() == "poison")
-                ItemDrawer.drawPoisonItem(g2, (thisItem.getX() * tileSize) + 90, (thisItem.getY() * tileSize) + 181, 41, 53);
+                ItemDrawer.drawPoisonItem(g2, (thisItem.getX() * tileSize) + 100, (thisItem.getY() * tileSize) + 181, 41, 53);
         }
     }
 
@@ -159,10 +157,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-
         if (e.getKeyCode() == KeyEvent.VK_UP && gameBoard.getWorm().getVelocityY() != 1 && isKeyPress == false) {
             gameBoard.setWormDirection('W');
-            currentDirection = 'W';     
+            currentDirection = 'W';
         } else if (
             e.getKeyCode() == KeyEvent.VK_DOWN && gameBoard.getWorm().getVelocityY() != -1 && isKeyPress == false
         ) {
@@ -197,35 +194,35 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
 
         gameBoard.update();
+        if (gameBoard.getGameOver()) gameOver();
+        if (gameBoard.getGameWin()) gameWin();
 
-        if (isSpeedIncrease) {
+        if (gameBoard.getIsSpeedUp()) {
             speedIncreaseCurrentTimer++;
             
             if (speedIncreaseCurrentTimer >= speedIncreaseCooldown) {
                 speedIncreaseCurrentTimer = 0;
-                isSpeedIncrease = false;
                 timer.start();
                 timerSpeedUp.stop();
+                gameBoard.setIsSpeedUp(false);
             }
         }
         
-        if (gameBoard.getGameOver()) gameOver();
-        if (gameBoard.getGameWin()) gameWin();
-        if (gameBoard.getIsEatApple()) {
-            if (gameBoard.getIsEatAppleType().equals("apple"))
+        if (gameBoard.getIsEatItem()) {
+            if (gameBoard.getIsEatItemType().equals("apple"))
                 currentScore++;
 
-            else if (gameBoard.getIsEatAppleType().equals("goldApple"))
+            else if (gameBoard.getIsEatItemType().equals("goldApple"))
                 currentScore += 3;
             
-            else if (gameBoard.getIsEatAppleType().equals("speedPotion"))
+            else if (gameBoard.getIsEatItemType().equals("speedPotion"))
                     {
                         timer.stop();
                         timerSpeedUp.start();
-                        isSpeedIncrease = true;
+                        gameBoard.setIsSpeedUp(true);
                     }
             
-            else if (gameBoard.getIsEatAppleType().equals("poison"))
+            else if (gameBoard.getIsEatItemType().equals("poison"))
                 currentScore--;
 
             if (gameBoard.getAmountEatItem() != 0 && gameBoard.getAmountEatItem() % 5 == 0) {
@@ -245,6 +242,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     public void gameStop() {
         timer.stop();
+        timerSpeedUp.stop();
+        gameBoard.setIsSpeedUp(false);
+        speedIncreaseCurrentTimer = 0;
     }
 
     public void resumeGame() {
@@ -259,6 +259,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     public void gameOver() {
         timer.stop();
+        timerSpeedUp.stop();
+        gameBoard.setIsSpeedUp(false);
+        speedIncreaseCurrentTimer = 0;
         GameConfig.savedGamePanel = null;
         if (currentScore > GameConfig.highScore)   
             user.updateScore(GameConfig.currentUser, String.valueOf(currentScore));
@@ -269,6 +272,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     public void gameWin() {
         timer.stop();
+        timerSpeedUp.stop();
+        gameBoard.setIsSpeedUp(false);
+        speedIncreaseCurrentTimer = 0;
         GameConfig.savedGamePanel = null;
         gameWinPage.setVisible(true);
         user.updateScore(GameConfig.currentUser, String.valueOf(currentScore));
@@ -277,12 +283,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     public void gameReset(){
+        timerSpeedUp.stop();
         gameBoard = new GameBoard();
         Body.clear();
         currentScore = 0;
 
         isKeyPress = false;
-        isSpeedIncrease = false;
+        gameBoard.setIsSpeedUp(false);
         speedIncreaseCurrentTimer = 0;
 
         setBody();

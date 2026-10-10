@@ -73,7 +73,7 @@ public class WriteFile {
             e.printStackTrace();
         }
     }
-    
+
     public void writeNewAccount(String Username, String password) {
         writeUsername(Username);
         writePassword(password);

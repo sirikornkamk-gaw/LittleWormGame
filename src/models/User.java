@@ -9,47 +9,46 @@ import config.GameConfig;
 
 public class User {
     private String username;    
-    private String password;
     private String score;
-
-    private ArrayList<String> usernameList;
-    private ArrayList<String> passwordList;
-    private ArrayList<String> scoreList;
 
     private ReadFile rf;
     private WriteFile wf;
 
     public User() {
-        rf = new ReadFile();
+        update();
         wf = new WriteFile();
-
-        usernameList = rf.getUsernames();
-        passwordList = rf.getPasswords();
-        scoreList = rf.getScores();
+        checkRep();
+    }
+    
+    public void checkRep() {
+        assert username == null || (!username.isEmpty()) : "username is empty";
+        assert score == null || (!score.isEmpty())
+                : "score is empty: " + score;
     }
     
     public String getUsername() {
         return username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public String getScore() {
         return score;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void update() {
+        rf = new ReadFile();
+        checkRep();
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setUsername(String username) {
+        if (username == null || username.isEmpty()) throw new IllegalArgumentException();
+        this.username = username;
+        checkRep();
     }
 
     public void setScore(String score) {
+        if (score == null || score.isEmpty()) throw new IllegalArgumentException();
         this.score = score;
+        checkRep();
     }
 
     public void updateScore(String username, String newScore) {
@@ -59,30 +58,46 @@ public class User {
     }
 
     public boolean isContainUsername(String username) {
+        if (username == null || username.isEmpty()) throw new IllegalArgumentException();
+
+        update();
         boolean isContain = false;
-        for (String u : usernameList) {
+        for (String u : rf.getUsernames()) {
             if (u.equals(username)) isContain = true; 
         }
         return isContain;
     }
 
+    public boolean isUsernameAndPasswordVaild(String username, String password) {
+        if (username.trim().isEmpty() ||
+            password.trim().isEmpty() ||
+            username.equals(" Username") ||
+            password.equals(" Password") ||
+            username.length() >= 20) {
+            return false;
+        }
+        return true;
+    }
+
     public void createNewAccount(String username, String password) {
+        if (username == null || username.isEmpty()) throw new IllegalArgumentException();
+        if (password == null || password.isEmpty()) throw new IllegalArgumentException();
         wf.writeNewAccount(username, password);
     }
 
     public boolean loginAccount(String username, String password) {
+        update();
+        if (username == null || username.isEmpty()) throw new IllegalArgumentException();
+        if (password == null || password.isEmpty()) throw new IllegalArgumentException();
         boolean isLoginSuccess = false;
             
-        for (int i = 0; i < usernameList.size(); i++) {
-            System.out.println(usernameList.get(i) + ", " + passwordList.get(i));
-            if (username.equals(usernameList.get(i)) && password.equals(passwordList.get(i))) {
-                setUsername(usernameList.get(i));
-                setPassword(passwordList.get(i));
-                setScore(scoreList.get(i));
+        for (int i = 0; i < rf.getUsernames().size(); i++) {
+            if (username.equals(rf.getUsernames().get(i)) && password.equals(rf.getPasswords().get(i))) {
+                setUsername(rf.getUsernames().get(i));
+                setScore(rf.getScores().get(i));
                 isLoginSuccess = true;
             }
         }
-        
         return isLoginSuccess;
     }
 
