@@ -103,6 +103,9 @@ public class GameBoard {
                     || worm.getY() < 0
                     || worm.getY() >= boardHeight;
 
+            boolean isAtWall = worm.getX() == 0 || worm.getX() == boardWidth - 1
+                    || worm.getY() == 0 || worm.getY() == boardHeight - 1;
+
             boolean isSelfCollision = false;
             for (Point body : worm.getBody()) {
                 if (collision(worm.getX(), worm.getY(), body.x, body.y)) {
@@ -110,7 +113,7 @@ public class GameBoard {
                 }
             }
 
-            assert isOutOfBoard || isSelfCollision
+            assert isOutOfBoard || isAtWall || isSelfCollision
                     : "gameOver is true but worm is inside the board and not self-overlapping";
         }
 
@@ -287,7 +290,11 @@ public class GameBoard {
             setIsMonthOpenFrame(0);
         }
 
-        worm.move();
+        // if wrom cannot move
+        // that meaning the worm will out of the board and gameover
+        if (!worm.move()) {
+            setGameOver(true);
+        }
         
         for (int i = 0; i < items.size(); i++) {
             if (getSecond() - items.get(i).getInitialSpawnTime() > despawnAppleSecond) {   
@@ -297,6 +304,9 @@ public class GameBoard {
             eatItem(i);
         }
         
+        // check is worm are on the same tile as a body
+        // if yes gamever
+        // we do not check the head of the worm is that out of the board because we check that on the move function
         isGameOver();
         isGameWin();
 
@@ -339,19 +349,6 @@ public class GameBoard {
     }
 
     public void isGameOver() {
-        if (worm.getX() < 0) {
-            setGameOver(true);
-
-        } else if (worm.getX() > boardWidth) {
-            setGameOver(true);
-        } 
-        else if (worm.getY() < 0) {
-            setGameOver(true);
-        }
-        else if (worm.getY() > boardHeight) {
-            setGameOver(true);
-        }
-        
         for (Point body : worm.getBody()) {
             if (collision(worm.getX(), worm.getY(), (int)body.getX(),(int)body.getY())) {
                 setGameOver(true);

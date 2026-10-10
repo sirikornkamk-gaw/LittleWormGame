@@ -2,7 +2,6 @@ package models;
 
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import config.GameConfig;
 
@@ -37,6 +36,30 @@ public class Worm {
     }
 
     public void checkRep() {
+        assert bodys != null : "bodys is null";
+
+        assert x >= 0 && x < boardWidth : "worm head x out of board: " + x;
+        assert y >= 0 && y < boardHeight : "worm head y out of board: " + y;
+
+        assert velocityX >= -1 && velocityX <= 1
+                : "velocityX out of range: " + velocityX;
+        assert velocityY >= -1 && velocityY <= 1
+                : "velocityY out of range: " + velocityY;
+
+        assert bodys.size() + 1 <= boardAllTile
+                : "worm length " + (bodys.size() + 1)
+                        + " exceeds board tiles " + boardAllTile;
+
+        for (int i = 0; i < bodys.size(); i++) {
+            Point body = bodys.get(i);
+            assert body != null : "body " + i + " is null";
+            assert body.x >= 0 && body.x < boardWidth
+                    && body.y >= 0 && body.y < boardHeight
+                    : "body " + i + " out of board: (" + body.x + "," + body.y + ")";
+
+            assert !(body.x == x && body.y == y)
+                    : "body " + i + " overlaps head at (" + x + "," + y + ")";
+        }
     }
 
     public int getX() {
@@ -90,16 +113,24 @@ public class Worm {
     }
 
 
-    public void move() {
+    public boolean move() {
+        int nextX = getX() + velocityX;
+        int nextY = getY() + velocityY;
+
+        if (nextX < 0 || nextX >= boardWidth || nextY < 0 || nextY >= boardHeight) {
+            return false;
+        }
+
         for (int i = bodys.size() - 1; i > 0; i--) {
             Point prev = bodys.get(i - 1);
             bodys.set(i, new Point(prev.x, prev.y));
         }
         bodys.set(0, new Point(getX(), getY()));
 
-        setX(getX() + getVelocityX());
-        setY(getY() + getVelocityY());
+        setX(nextX);
+        setY(nextY);
         checkRep();
+        return true;
     }
 
     public Point getLastBody() {
