@@ -47,6 +47,7 @@ public class GameBoard {
         setIsMonthOpenFrame(0);
         isSpeedUp = false;
         setSecond(0);
+        isEatItemType = "";
         
         setGameOver(false);
         setGameWin(false);
@@ -118,7 +119,7 @@ public class GameBoard {
         }
 
         if (gameWin) {
-            assert worm.getBodySize() == boardWidth * boardHeight
+            assert worm.getBodySize() == boardWidth * boardHeight - 1
                     : "gameWin flag but board is not full";
         }
     }
@@ -213,7 +214,8 @@ public class GameBoard {
     }
 
     public void setIsMonthOpenFrame(int value) {
-        if (isMonthOpenFrame > 2) throw new IllegalArgumentException();
+        //if (isMonthOpenFrame > 2) throw new IllegalArgumentException();
+        if (value < 0 || value > 2) throw new IllegalArgumentException();
         this.isMonthOpenFrame = value;
     }
 
@@ -296,7 +298,8 @@ public class GameBoard {
             setGameOver(true);
         }
         
-        for (int i = 0; i < items.size(); i++) {
+        //for (int i = 0; i < items.size(); i++) {
+        for (int i = items.size() - 1; i >= 0 ; i--) {
             if (getSecond() - items.get(i).getInitialSpawnTime() > despawnAppleSecond) {   
                 items.remove(i);
                 addItem(getSecond());
@@ -325,6 +328,8 @@ public class GameBoard {
     public void reset() {
         worm = new Worm(5, 5);
 
+        items.clear();
+
         addItem(getSecond());
         addItem(getSecond());
         addItem(getSecond());
@@ -334,7 +339,17 @@ public class GameBoard {
         addItem(getSecond());
         addItem(getSecond());
 
+        // setSecond(0);
+        // setGameOver(false);
+        // setGameWin(false);
+        isEatItem = false;
+        setAmountEatItem(0);
+        isMonthOpen = false;
+        setIsMonthOpenFrame(0);
+        isSpeedUp = false;
         setSecond(0);
+        isEatItemType = "";
+        
         setGameOver(false);
         setGameWin(false);
         checkRep();
@@ -365,6 +380,6 @@ public class GameBoard {
     }
 
     public void isGameWin() {
-        if (worm.getBody().size() == boardWidth * boardHeight) setGameWin(true);
+        if (worm.getBody().size() == boardWidth * boardHeight-1) setGameWin(true);
     }   
 }
