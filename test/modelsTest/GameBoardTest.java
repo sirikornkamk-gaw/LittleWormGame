@@ -189,11 +189,6 @@ public class GameBoardTest {
         b.setWormDirection('S');
         check("press W, worm going up, press S (opposite), worm still up", velocity(b, 0, -1));
 
-        // b = new GameBoard();
-        // b.setWormDirection('W');
-        // b.setWormDirection('A');
-        // check("press W then press A in same frame, worm must not reverse", !velocity(b, -1, 0));
-
         // --- Wall Collision ---
         System.out.println("\n--- Wall Collision ---");
         b = new GameBoard();
