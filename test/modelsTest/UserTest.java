@@ -13,8 +13,8 @@ import models.ReadFile;
 import models.User;
 
 public class UserTest {
-    private static int passed = 0;
-    private static int failed = 0;
+    public static int passed = 0;
+    public static int failed = 0;
 
     private static final Path DATA = Paths.get(GameConfig.userData);
     private static final Path SESSION = Paths.get(GameConfig.sessionFile);
@@ -110,7 +110,7 @@ public class UserTest {
         System.out.println("Total : " + (passed + failed));
         System.out.println(failed == 0 ? "ALL TESTS PASSED" : "SOME TESTS FAILED");
 
-        if (failed > 0) {
+        if (failed > 0 && System.getProperty("runNull") == null) {
             System.exit(1);
         }
     }

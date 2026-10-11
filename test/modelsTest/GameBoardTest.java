@@ -9,8 +9,8 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class GameBoardTest {
-    private static int passed = 0;
-    private static int failed = 0;
+    public static int passed = 0;
+    public static int failed = 0;
 
     private static final int COLS = GameConfig.BOARD_WIDTH / GameConfig.tilesize ;
     private static final int ROWS = GameConfig.BOARD_HEIGHT / GameConfig.tilesize;
@@ -43,7 +43,7 @@ public class GameBoardTest {
         System.out.println("Total : " + (passed + failed));
         System.out.println(failed == 0 ? "ALL TESTS PASSED" : "SOME TESTS FAILED");
 
-        if (failed > 0) {
+        if (failed > 0 && System.getProperty("runNull") == null) {
             System.exit(1);
         }
     }
