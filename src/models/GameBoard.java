@@ -99,22 +99,21 @@ public class GameBoard {
         }
 
         if (gameOver) {
-            boolean isOutOfBoard = worm.getX() < 0
-                    || worm.getX() >= boardWidth
-                    || worm.getY() < 0
-                    || worm.getY() >= boardHeight;
+            int nextX = worm.getX() + worm.getVelocityX();
+            int nextY = worm.getY() + worm.getVelocityY();
 
-            boolean isAtWall = worm.getX() == 0 || worm.getX() == boardWidth - 1
-                    || worm.getY() == 0 || worm.getY() == boardHeight - 1;
+            boolean isOutOfBoard = nextX < 0 || nextX >= boardWidth
+                    || nextY < 0 || nextY >= boardHeight;
 
             boolean isSelfCollision = false;
             for (Point body : worm.getBody()) {
-                if (collision(worm.getX(), worm.getY(), body.x, body.y)) {
+                if (collision(worm.getX(), worm.getY(), body.x, body.y)
+                        || collision(nextX, nextY, body.x, body.y)) {
                     isSelfCollision = true;
                 }
             }
 
-            assert isOutOfBoard || isAtWall || isSelfCollision
+            assert isOutOfBoard || isSelfCollision
                     : "gameOver is true but worm is inside the board and not self-overlapping";
         }
 
@@ -214,7 +213,6 @@ public class GameBoard {
     }
 
     public void setIsMonthOpenFrame(int value) {
-        //if (isMonthOpenFrame > 2) throw new IllegalArgumentException();
         if (value < 0 || value > 2) throw new IllegalArgumentException();
         this.isMonthOpenFrame = value;
     }
@@ -298,7 +296,6 @@ public class GameBoard {
             setGameOver(true);
         }
         
-        //for (int i = 0; i < items.size(); i++) {
         for (int i = items.size() - 1; i >= 0 ; i--) {
             if (getSecond() - items.get(i).getInitialSpawnTime() > despawnAppleSecond) {   
                 items.remove(i);
@@ -339,9 +336,6 @@ public class GameBoard {
         addItem(getSecond());
         addItem(getSecond());
 
-        // setSecond(0);
-        // setGameOver(false);
-        // setGameWin(false);
         isEatItem = false;
         setAmountEatItem(0);
         isMonthOpen = false;

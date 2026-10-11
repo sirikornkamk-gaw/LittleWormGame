@@ -133,6 +133,5 @@ public class WormTest {
         check("call addTail() two times and moving two step, the body segments are correctly aligned ", 
             getBodyPosition(w, 0, 6, 5) && getBodyPosition(w, 1, 5, 5) && getBodyPosition(w, 2, 4, 5) && 
             getBodyPosition(w, 3, 3, 5) && getBodyPosition(w, 4, 2, 5));
-
     }
 }

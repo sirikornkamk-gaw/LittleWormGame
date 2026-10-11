@@ -114,10 +114,24 @@ public class Worm {
 
 
     public boolean move() {
+        boolean isOutBoard = false;
+        boolean isOverlapBody = false;
+
         int nextX = getX() + velocityX;
         int nextY = getY() + velocityY;
 
         if (nextX < 0 || nextX >= boardWidth || nextY < 0 || nextY >= boardHeight) {
+            isOutBoard = true;
+        }
+
+        for (Point body : bodys) {
+            if (body.x == nextX && body.y == nextY) {
+                isOverlapBody = true;
+                break;
+            }
+        }
+
+        if (isOutBoard || isOverlapBody) {
             return false;
         }
 
