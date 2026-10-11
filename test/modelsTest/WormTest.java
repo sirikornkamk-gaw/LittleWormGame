@@ -1,10 +1,15 @@
 package test.modelsTest;
 
+import java.awt.Point;
+
+import config.GameConfig;
 import models.Worm;
 
 public class WormTest {
     private static int passed = 0;
     private static int failed = 0;
+    private static final int COLS = GameConfig.BOARD_WIDTH / GameConfig.tilesize ;
+    private static final int ROWS = GameConfig.BOARD_HEIGHT / GameConfig.tilesize;
 
     /** helper กลาง — พิมพ์ PASS/FAIL และนับผลให้เอง */
     private static void check(String name, boolean condition) {
@@ -39,8 +44,29 @@ public class WormTest {
         }
     }
 
-    public static boolean getBodyPosition(Worm w, int segment, int x, int y) {
+    //-------- helper ----------
+
+    private static boolean getBodyPosition(Worm w, int segment, int x, int y) {
         return w.getBody(segment).getX() == x && w.getBody(segment).getY() == y ;
+    }
+
+    private static Worm makeWorm(int hx, int hy, int vx, int vy, int[][] body) {
+        Worm w = new Worm(5, 5);
+        w.setX(hx);
+        w.setY(hy);
+        w.setVelocityX(vx);
+        w.setVelocityY(vy);
+        for (int i = 0 ; i < body.length ; i++) {
+            if (i < w.getBodySize()) 
+                w.setBody(body[i][0], body[i][1], i);
+            else
+                w.getBody().add(new Point(body[i][0], body[i][1]));
+        }
+        return w;
+    } 
+
+    private static String rememberWormPosition(Worm w) {
+        return w.getX()+","+w.getY()+","+w.getBody().toString();
     }
 
     public static void  runtest() {
@@ -97,9 +123,39 @@ public class WormTest {
         w = new Worm(5, 5);
         for(int i=0 ; i<5 ; i++) {
             w.move();
-            i++;
         }
         check("move right 5 times, length remains the same", w.getBodySize() == 3);
+
+        w = new Worm(5, 5);
+        check("normal move return true", w.move());
+
+        w = makeWorm(COLS-1, 5, 1, 0, new int[][] {{COLS-2, 5}, {COLS-3, 5}, {COLS-4, 5}});
+        String before = rememberWormPosition(w);
+        check("worm can't move into the right wall", !w.move() && rememberWormPosition(w).equals(before));
+        
+        w = makeWorm(0, 5, -1, 0, new int[][] {{1, 5}, {2, 5}, {3, 5}});
+        before = rememberWormPosition(w);
+        check("worm can't move into the left wall", !w.move() && rememberWormPosition(w).equals(before));
+
+        w = makeWorm(5, ROWS-1, 0, 1, new int[][] {{5, ROWS-2}, {5, ROWS-3}, {5, ROWS-4}});
+        before = rememberWormPosition(w);
+        check("worm can't move into the bottom wall", !w.move() && rememberWormPosition(w).equals(before));
+
+        w = makeWorm(5, 0, 0, -1, new int[][] {{5, 1}, {5, 2}, {5, 3}});
+        before = rememberWormPosition(w);
+        check("worm can't move into the top wall", !w.move() && rememberWormPosition(w).equals(before));
+
+        w = makeWorm(5, 5, 1, 0, new int[][] {{4, 5}, {4, 6}, {5, 6}, {6, 6}, {6, 5}, {6, 4}});
+        before = rememberWormPosition(w);
+        check("worm can't move into own body", !w.move() && rememberWormPosition(w).equals(before));
+
+        w = new Worm(5, 5);
+        w.setVelocityX(-1);
+        before = rememberWormPosition(w);
+        check("worm can't turn back into own neck", !w.move() && rememberWormPosition(w).equals(before));
+
+        w = makeWorm(5, 5, 1, 0, new int[][] {{4, 5}, {4, 6}, {5, 6}, {6, 6}, {6, 5}});
+        check("worm can move into the cell the tail just left", w.move());
 
         // --- getter/setter ---
         System.out.println("\n--- getter/setter ---");
@@ -110,6 +166,62 @@ public class WormTest {
         w.setBody(2, 2, 0);
         check("can change body position", getBodyPosition(w, 0, 2, 2));
         check("call getLastBody() returns the tail position (2,5)", w.getLastBody().getX() == 2 && w.getLastBody().getY() == 5);
+
+        w = new Worm(5, 5);
+        check("getBodySize() equals getBody().size()", w.getBodySize() == w.getBody().size());
+
+        boolean threw = false;
+        try {
+            w.setVelocityX(1);
+            w.setVelocityX(0);
+            w.setVelocityX(-1);
+        } catch (IllegalArgumentException e) {
+            threw = true;
+        }
+        check("setVelocityX(-1), (0), (1) are allowed", !threw && w.getVelocityX() == -1);
+
+        threw = false;
+        try {
+            w.setVelocityX(2);
+        } catch (IllegalArgumentException e) {
+            threw = true;
+        }
+        check("setVelocityX(2) throws IllegalArgumentException", threw);
+
+        threw = false;
+        try {
+            w.setVelocityX(-2);
+        } catch (IllegalArgumentException e) {
+            threw = true;
+        }
+        check("setVelocityX(-2) throws IllegalArgumentException", threw);
+
+        threw = false;
+        try {
+            w.setVelocityY(1);
+            w.setVelocityY(0);
+            w.setVelocityY(-1);
+        } catch (IllegalArgumentException e) {
+            threw = true;
+        }
+        check("setVelocityY(-1), (0), (1) are allowed", !threw && w.getVelocityY() == -1);
+
+        threw = false;
+        try {
+            w.setVelocityY(2);
+        } catch (IllegalArgumentException e) {
+            threw = true;
+        }
+        check("setVelocityY(2) throws IllegalArgumentException", threw);
+
+        threw = false;
+        try {
+            w.setVelocityY(-2);
+        } catch (IllegalArgumentException e) {
+            threw = true;
+        }
+        check("setVelocityX(-2) throws IllegalArgumentException", threw);
+
         
 
         // --- addtail ---
@@ -133,5 +245,23 @@ public class WormTest {
         check("call addTail() two times and moving two step, the body segments are correctly aligned ", 
             getBodyPosition(w, 0, 6, 5) && getBodyPosition(w, 1, 5, 5) && getBodyPosition(w, 2, 4, 5) && 
             getBodyPosition(w, 3, 3, 5) && getBodyPosition(w, 4, 2, 5));
+
+        w = makeWorm(5, 5, 1, 0, new int[][] {{4, 5}, {4, 6}, {5, 6}, {6, 6}, {6, 5}});
+        w.addTail();
+        check("just addTail(), can't move into the cell the tail just left", !w.move());
+
+        w = new Worm(5, 5);
+        while (w.getBodySize() < 299)
+            w.addTail();
+        check("worm can grow to 299 body segments", w.getBodySize() == 299);
+
+        threw = false;
+        try {
+            w.addTail();
+        } catch (IllegalArgumentException e) {
+            threw = true;
+        }
+        check("addTail() at 299 segments throw IllegalArgumentException", threw);
+        check("addTail() at 299 segments, body still 299 segments", w.getBodySize() == 299);
     }
 }
