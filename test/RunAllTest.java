@@ -15,7 +15,7 @@ public class RunAllTest {
         GameBoardTest.main(args);
         System.out.println();
         UserTest.main(args);
-        System.err.println();
+        System.out.println();
         ItemTest.main(args);
 
         int passed = WormTest.passed + GameBoardTest.passed + UserTest.passed + ItemTest.passed;
