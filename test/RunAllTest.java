@@ -3,10 +3,11 @@ package test;
 import test.modelsTest.GameBoardTest;
 import test.modelsTest.UserTest;
 import test.modelsTest.WormTest;
+import test.modelsTest.ItemTest;
 
 public class RunAllTest {
     public static void main(String[] args) {
-        
+
         System.setProperty("runAll", "true");
 
         WormTest.main(args);
@@ -14,9 +15,11 @@ public class RunAllTest {
         GameBoardTest.main(args);
         System.out.println();
         UserTest.main(args);
+        System.err.println();
+        ItemTest.main(args);
 
-        int passed = WormTest.passed + GameBoardTest.passed + UserTest.passed;
-        int failed = WormTest.failed + GameBoardTest.failed + UserTest.failed;
+        int passed = WormTest.passed + GameBoardTest.passed + UserTest.passed + ItemTest.passed;
+        int failed = WormTest.failed + GameBoardTest.failed + UserTest.failed + ItemTest.failed;
 
         System.out.println("\n==============================");
         System.out.println("        ALL TESTS SUMMARY");
@@ -24,6 +27,7 @@ public class RunAllTest {
         System.out.println("WormTest      : " + WormTest.passed + " passed, " + WormTest.failed + " failed");
         System.out.println("GameBoardTest : " + GameBoardTest.passed + " passed, " + GameBoardTest.failed + " failed");
         System.out.println("UserTest      : " + UserTest.passed + " passed, " + UserTest.failed + " failed");
+        System.out.println("ItemTest      : " + ItemTest.passed + " passed, " + ItemTest.failed + " failed");
         System.out.println("------------------------------");
         System.out.println("Total         : " + passed + " passed, " + failed + " failed");
         System.out.println(failed == 0 ? "ALL TESTS PASSED" : "SOME TESTS FAILED");

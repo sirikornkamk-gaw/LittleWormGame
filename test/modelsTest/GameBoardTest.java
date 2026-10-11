@@ -15,7 +15,7 @@ public class GameBoardTest {
     private static final int COLS = GameConfig.BOARD_WIDTH / GameConfig.tilesize ;
     private static final int ROWS = GameConfig.BOARD_HEIGHT / GameConfig.tilesize;
 
-    /** helper กลาง — พิมพ์ PASS/FAIL และนับผลให้เอง */
+    /* helper กลาง — พิมพ์ PASS/FAIL และนับผลให้เอง */
     private static void check(String name, boolean condition) {
         if (condition) {
             passed++;
@@ -266,6 +266,12 @@ public class GameBoardTest {
         b.isGameWin();
         check("worm fills the whole board (head + body = " + (COLS * ROWS) + "), game win", b.getGameWin());
 
+        b = new GameBoard();
+         while(b.getWorm().getBodySize() < COLS*ROWS - 2)
+            b.getWorm().addTail();
+        b.isGameWin();
+        check("call isGameWin when worm is one short of full board, getGamewin retur false", !b.getGameWin());
+
         // --- addItem ---
         System.out.println("\n--- addItem ---");
         b = new GameBoard();
@@ -401,7 +407,7 @@ public class GameBoardTest {
         makeASpaceForTest(b);
         b.setIsSpeedUp(true);
         b.update();
-        check("one speed up frame is 0.5 second", Math.abs(b.getSecond() - 0.05f) <0.0001);
+        check("one speed up frame is 0.05 second", Math.abs(b.getSecond() - 0.05f) <0.0001);
 
         b = new GameBoard();
         makeASpaceForTest(b);
@@ -445,17 +451,28 @@ public class GameBoardTest {
 
         threw = false;
         try {
-            b.setIsMonthOpenFrame(5);
+            b.setIsMonthOpenFrame(3);
         }catch (IllegalArgumentException e) {
             threw = true;
         }
-        check("setIsMonthOpenFrame(5)) throws IllegalArgumentException", threw);
+        check("setIsMonthOpenFrame(3) throws IllegalArgumentException", threw);   
 
+        threw = false;
+        try {
+            b.setIsMonthOpenFrame(-1);
+        } catch (IllegalArgumentException e) {
+            threw = true;
+        }
+        check("setIsMonthOpenFrame(-1) throws IllegalArgumentException", threw);
 
-        
+        threw = false;
+        try {
+            b.setIsMonthOpenFrame(0);
+            b.setIsMonthOpenFrame(1);
+            b.setIsMonthOpenFrame(2);
+        } catch (Exception e) {
+            threw = true;
+        }
+        check("setIsMonthOpenFrame(0), (1), (2) is allowed", !threw);
     }
-        
-
-
-    
 }
