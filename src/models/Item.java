@@ -59,8 +59,8 @@ public class Item {
 
     public void setType(String type) {
         if (type == null || type.isEmpty()) throw new IllegalArgumentException();
-        // if (!type.equals("apple") && !type.equals("goldApple")
-        //         && !type.equals("speedPotion") && !type.equals("poison")) throw new IllegalArgumentException();
+        if (!type.equals("apple") && !type.equals("goldApple")
+            && !type.equals("speedPotion") && !type.equals("poison")) throw new IllegalArgumentException();
         
         this.type = type;
         checkRep();

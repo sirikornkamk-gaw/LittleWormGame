@@ -11,7 +11,7 @@ public class WormTest {
     private static final int COLS = GameConfig.BOARD_WIDTH / GameConfig.tilesize ;
     private static final int ROWS = GameConfig.BOARD_HEIGHT / GameConfig.tilesize;
 
-    /** helper กลาง — พิมพ์ PASS/FAIL และนับผลให้เอง */
+    /* helper กลาง — พิมพ์ PASS/FAIL และนับผลให้เอง */
     private static void check(String name, boolean condition) {
         if (condition) {
             passed++;
