@@ -6,8 +6,8 @@ import config.GameConfig;
 import models.Worm;
 
 public class WormTest {
-    private static int passed = 0;
-    private static int failed = 0;
+    public static int passed = 0;
+    public static int failed = 0;
     private static final int COLS = GameConfig.BOARD_WIDTH / GameConfig.tilesize ;
     private static final int ROWS = GameConfig.BOARD_HEIGHT / GameConfig.tilesize;
 
@@ -39,7 +39,7 @@ public class WormTest {
         System.out.println("Total : " + (passed + failed));
         System.out.println(failed == 0 ? "ALL TESTS PASSED" : "SOME TESTS FAILED");
 
-        if (failed > 0) {
+        if (failed > 0 && System.getProperty("runAll") == null) {
             System.exit(1);
         }
     }
@@ -68,6 +68,8 @@ public class WormTest {
     private static String rememberWormPosition(Worm w) {
         return w.getX()+","+w.getY()+","+w.getBody().toString();
     }
+
+    // ---- runtest ----
 
     public static void  runtest() {
 
@@ -220,9 +222,12 @@ public class WormTest {
         } catch (IllegalArgumentException e) {
             threw = true;
         }
-        check("setVelocityX(-2) throws IllegalArgumentException", threw);
+        check("setVelocityY(-2) throws IllegalArgumentException", threw);
 
-        
+        w = new Worm(5, 5);
+        Point last = w.getLastBody();
+        last.x = 99;
+        check("change the point from getLastBody() don't change the real tail", getBodyPosition(w, 2, 2, 5));
 
         // --- addtail ---
         System.out.println("\n--- addtail ---");
