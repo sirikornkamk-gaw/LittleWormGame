@@ -4,15 +4,9 @@ import javax.swing.* ;
 import java.awt.* ;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
 
 import config.GameConfig;
-import models.ReadFile;
 import models.User;
-import models.WriteFile;
 
 public class SignupPanel extends JPanel implements ActionListener {
     private JPanel cardContainer ;
@@ -22,13 +16,9 @@ public class SignupPanel extends JPanel implements ActionListener {
     private JTextField tUser ;
     private JPasswordField pf1, pf2 ;
 
-    // ReadFile rf;
-    // WriteFile wf;
     private User user;
 
     public SignupPanel(){
-        // rf = new ReadFile();
-        // wf = new WriteFile();
         user = new User();
         
         setLayout(new GridBagLayout());
@@ -151,13 +141,6 @@ public class SignupPanel extends JPanel implements ActionListener {
         if (e.getSource() == bquit) {
             this.setVisible(false);
         } else if (e.getSource() == bsignup) {
-            // if (Username.trim().isEmpty() || 
-            // password1.trim().isEmpty() ||
-            // password2.trim().isEmpty() ||
-            // Username.equals(" Username") || 
-            // password1.equals(" Password")||
-            // password2.equals(" Password"
-            // ))
             boolean isAccountVaild = user.isUsernameAndPasswordVaild(Username, password1);
             if (!isAccountVaild)  
         {
@@ -191,7 +174,7 @@ public class SignupPanel extends JPanel implements ActionListener {
                 tUser.setText("");
                 pf1.setText("");
                 pf2.setText("");
-                // this.setVisible(false);
+                this.setVisible(false);
             }
         }
     }

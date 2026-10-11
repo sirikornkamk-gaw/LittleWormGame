@@ -2,10 +2,6 @@ package config;
 import java.awt.* ;
 import java.io.*;
 
-import javax.swing.JPanel;
-import javax.swing.Timer;
-
-import models.GameBoard;
 import views.GamePanel;
 
 

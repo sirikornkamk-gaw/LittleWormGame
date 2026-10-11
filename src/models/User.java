@@ -1,9 +1,4 @@
-// remove the password out of this file and call the function if we will to access the password
-// try to not collect the usernamelist and scorelist. just use a function that we wrtei on other file like rf or wf
-
 package models;
-
-import java.util.ArrayList;
 
 import config.GameConfig;
 
@@ -86,9 +81,9 @@ public class User {
     }
 
     public boolean loginAccount(String username, String password) {
+        // we do not check the null or empty 
+        // because we will check that with function isUsernameAndPasswordVaild that have been call before allow to process the login
         update();
-        if (username == null || username.isEmpty()) throw new IllegalArgumentException();
-        if (password == null || password.isEmpty()) throw new IllegalArgumentException();
         boolean isLoginSuccess = false;
             
         for (int i = 0; i < rf.getUsernames().size(); i++) {

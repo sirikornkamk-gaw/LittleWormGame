@@ -6,8 +6,6 @@ import models.User;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.FileReader;
 
 
 
@@ -189,28 +187,6 @@ public class LoginPanel extends JPanel implements ActionListener {
                 tagwarnning.setVisible(true);
             }
 
-            // try (BufferedReader br = new BufferedReader(new FileReader(GameConfig.userData))) {
-            //     String s ;
-            //     boolean isAc = false ;
-            //     while ((s = br.readLine()) != null) {
-            //         String arr[] = s.split(",");
-            //         if (Username.equals(arr[0]) && password.equals(arr[1])) {
-            //             tagwarnning.ShowtagWarnning("Success!", "Welcome to\nlittle Worm Game!");
-            //             isAc = true ;
-            //             this.setVisible(false);
-            //             int userHighscore = Integer.parseInt(arr[2].trim());
-            //             GameConfig.saveSession(true, Username,userHighscore);
-            //             mainFrame.loginSuccess(Username, String.valueOf(userHighscore));
-            //             break;
-            //         }
-            //     }
-            // br.close();
-                
-                // if (isAccountExist == false) {
-                // }
-                // } catch (Exception a) {
-            //     a.printStackTrace();
-            // }
         }else if (e.getSource() == bsignup) {
             this.setVisible(false);
             signupPage.setVisible(true);

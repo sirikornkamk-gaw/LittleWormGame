@@ -50,7 +50,11 @@ public class Worm {
                 : "worm length " + (bodys.size() + 1)
                         + " exceeds board tiles " + boardAllTile;
 
+            
+        // System.out.println("head: " +  x + ", " + y);
         for (int i = 0; i < bodys.size(); i++) {
+            // System.out.println(bodys.get(i).x + ", " + bodys.get(i).y);
+            // System.out.println();
             Point body = bodys.get(i);
             assert body != null : "body " + i + " is null";
             assert body.x >= 0 && body.x < boardWidth
@@ -124,8 +128,14 @@ public class Worm {
             isOutBoard = true;
         }
 
-        for (Point body : bodys) {
-            if (body.x == nextX && body.y == nextY) {
+        ArrayList<Point> newBody = new ArrayList<>();
+        newBody.add(new Point(getX(), getY()));
+        for (int i = 0; i < bodys.size() - 1; i++) {
+            newBody.add(new Point(bodys.get(i).x, bodys.get(i).y));
+        }
+
+        for (Point newbody : newBody) {
+            if (newbody.x == nextX && newbody.y == nextY) {
                 isOverlapBody = true;
                 break;
             }
@@ -135,12 +145,7 @@ public class Worm {
             return false;
         }
 
-        for (int i = bodys.size() - 1; i > 0; i--) {
-            Point prev = bodys.get(i - 1);
-            bodys.set(i, new Point(prev.x, prev.y));
-        }
-        bodys.set(0, new Point(getX(), getY()));
-
+        bodys = newBody;
         setX(nextX);
         setY(nextY);
         checkRep();
