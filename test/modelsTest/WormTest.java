@@ -26,7 +26,7 @@ public class WormTest {
         assert assertsOn = true;
         if (!assertsOn) {
             System.out.println("WARNING: assertions disabled"
-                    + " - re-run with: java -ea PlaylistTest\n");
+                    + " - re-run with: java -ea WormTest\n");
         }
 
         System.out.println("=== Worm Test ===");

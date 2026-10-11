@@ -114,7 +114,7 @@ public class ItemTest {
             threw = true;
         }
         check("setY(ROWS) throw IllegalArgumentException e", threw);
-        check("setY(ROWS) x stay 4", item.getY() == 4);
+        check("setY(ROWS) y stay 4", item.getY() == 4);
 
         // --- setType ---
         System.out.println("\n--- setType ---");
