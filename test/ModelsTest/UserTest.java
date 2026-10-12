@@ -67,6 +67,22 @@ public class UserTest {
         }
     }
 
+    private static void writeSession(String content) throws IOException {
+        Files.write(SESSION, content.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /** true ถ้า code โยน IllegalArgumentException */
+    private static boolean throwsIAE(Runnable r) {
+        try {
+            r.run();
+        } catch (IllegalArgumentException e) {
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
+    }
+
     public static void main(String[] args) {
         boolean assertsOn = false;
         assert assertsOn = true;
@@ -77,7 +93,7 @@ public class UserTest {
 
         System.out.println("=== User Test (Login / Sign up) ===");
 
-        // backup ไฟล์จริง แล้วคืนค่าให้หลังเทส
+       
         byte[] dataBackup = null;
         byte[] sessionBackup = null;
         try {
@@ -134,8 +150,7 @@ public class UserTest {
         writeData(SEED);
         User u = new User();
         check("login with correct username and password returns true", quietLogin(u, "kiddo", "1234"));
-        // check("after login, getUsername() is kiddo", "kiddo".equals(u.getUsername()));
-        // check("after login, getPassword() is 1234", "1234".equals(u.getPassword()));
+        check("after login, getUsername() is kiddo", "kiddo".equals(u.getUsername()));
         check("after login, getScore() is 5", "5".equals(u.getScore()));
 
         u = new User();
@@ -220,5 +235,108 @@ public class UserTest {
         check("logout clears current user", GameConfig.currentUser.equals(""));
         check("logout resets high score to 0", GameConfig.highScore == 0);
         check("logout writes 'false,,0' to session file", readSession().equals("false,,0"));
+
+        GameConfig.saveSession(true, "yam", 7);
+        GameConfig.clearSession();
+        check("clearSession alone resets isLogin", !GameConfig.isLogin);
+        check("clearSession alone resets username and score",
+                GameConfig.currentUser.equals("") && GameConfig.highScore == 0);
+
+        writeSession("");
+        GameConfig.isLogin = true;
+        GameConfig.currentUser = "keep";
+        GameConfig.highScore = 9;
+        GameConfig.loadSession();
+        check("loadSession with empty session file keeps current values",
+                GameConfig.isLogin && GameConfig.currentUser.equals("keep") && GameConfig.highScore == 9);
+
+        // --- ReadFile ---
+        System.out.println("\n--- ReadFile (more) ---");
+        writeData(SEED);
+        rf = new ReadFile();
+        check("isContainPassword finds existing password", rf.isContainPassword("1234"));
+        check("isContainPassword returns false for unknown password", !rf.isContainPassword("nope"));
+        check("isContainScore finds existing score", rf.isContainScore("52"));
+        check("isContainScore returns false for unknown score", !rf.isContainScore("999"));
+        check("each account row has 3 fields", rf.getAccounts().get(2).length == 3);
+        writeData(SEED + "z,z,0\n");
+        rf.update();
+        check("update() re-reads the file (5 accounts)", rf.getAccounts().size() == 5);
+        check("update() does not duplicate old rows", rf.getUsernames().size() == 5);
+
+        // --- WriteFile ---
+        System.out.println("\n--- WriteFile ---");
+        writeData("");
+        models.WriteFile wf = new models.WriteFile();
+        wf.writeUsername("a");
+        wf.writePassword("b");
+        wf.writeScore("3");
+        wf.writeNewLine();
+        check("writeUsername + writePassword + writeScore + writeNewLine build one line",
+                readData().equals("a,b,3\n"));
+
+        writeData("");
+        wf.writeNewAccount("bob", "pw");
+        check("writeNewAccount writes 'bob,pw,0'", readData().equals("bob,pw,0\n"));
+
+        writeData(SEED);
+        wf.updateScore("Gong", "99");
+        check("WriteFile.updateScore changes the target user's score",
+                readData().equals("Gong,159357,99\nUser123456,123456,52\nkiddo,1234,5\nyam,yam190450,1\n"));
+
+        writeData(SEED);
+        wf.updateScore("ghost", "99");
+        check("WriteFile.updateScore with unknown user leaves file unchanged", readData().equals(SEED));
+
+        // --- User (setters / edge cases) ---
+        System.out.println("\n--- User (setters / edge cases) ---");
+        writeData(SEED);
+        u = new User();
+        check("new User() has no username before login", u.getUsername() == null);
+        u.setUsername("tom");
+        u.setScore("8");
+        check("setUsername / getUsername", "tom".equals(u.getUsername()));
+        check("setScore / getScore", "8".equals(u.getScore()));
+
+        writeData(SEED);
+        u = new User();
+        u.updateScore("ghost", "5");
+        check("User.updateScore with unknown user leaves file unchanged", readData().equals(SEED));
+
+        writeData("");
+        u = new User();
+        check("empty user file: no username found", !u.isContainUsername("Gong"));
+        check("empty user file: login returns false", !quietLogin(u, "Gong", "159357"));
+        u.createNewAccount("first", "1");
+        check("sign up into an empty file works", readData().equals("first,1,0\n"));
+        check("login works after sign up into an empty file", quietLogin(new User(), "first", "1"));
+
+        writeData(SEED);
+        u = new User();
+        u.createNewAccount("newbie", "pass99");
+        check("new account cannot log in with wrong password", !quietLogin(new User(), "newbie", "wrong"));
+
+        
+        System.out.println("\n--- validation ---");
+        writeData(SEED);
+        u = new User();
+        check("isUsernameAndPasswordVaild accepts normal input", u.isUsernameAndPasswordVaild("kiddo", "1234"));
+        check("isUsernameAndPasswordVaild rejects empty username", !u.isUsernameAndPasswordVaild("", "1234"));
+        check("isUsernameAndPasswordVaild rejects blank username", !u.isUsernameAndPasswordVaild("   ", "1234"));
+        check("isUsernameAndPasswordVaild rejects empty password", !u.isUsernameAndPasswordVaild("kiddo", ""));
+        check("isUsernameAndPasswordVaild rejects placeholder ' Username'", !u.isUsernameAndPasswordVaild(" Username", "1234"));
+        check("isUsernameAndPasswordVaild rejects placeholder ' Password'", !u.isUsernameAndPasswordVaild("kiddo", " Password"));
+        check("isUsernameAndPasswordVaild rejects username of 20 characters",
+                !u.isUsernameAndPasswordVaild("12345678901234567890", "1234"));
+        check("isUsernameAndPasswordVaild accepts username of 19 characters",
+                u.isUsernameAndPasswordVaild("1234567890123456789", "1234"));
+        check("setUsername rejects empty string", throwsIAE(() -> new User().setUsername("")));
+        check("setUsername rejects null", throwsIAE(() -> ( new User()).setUsername(null)));
+        check("setScore rejects empty string", throwsIAE(() -> new User().setScore("")));
+        check("setScore rejects null", throwsIAE(() -> new User().setScore(null)));
+        check("isContainUsername rejects empty string", throwsIAE(() -> new User().isContainUsername("")));
+        check("createNewAccount rejects empty username", throwsIAE(() -> new User().createNewAccount("", "pw")));
+        check("createNewAccount rejects empty password", throwsIAE(() -> new User().createNewAccount("bob", "")));
+        check("rejected createNewAccount does not change the file", readData().equals(SEED));
     }
 }
