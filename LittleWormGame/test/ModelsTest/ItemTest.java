@@ -1,4 +1,4 @@
-package test.modelsTest;
+package test.ModelsTest;
 
 import config.GameConfig;
 import models.Apple;

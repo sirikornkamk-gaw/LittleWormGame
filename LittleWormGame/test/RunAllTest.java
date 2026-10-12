@@ -1,9 +1,9 @@
 package test;
 
-import test.modelsTest.GameBoardTest;
-import test.modelsTest.UserTest;
-import test.modelsTest.WormTest;
-import test.modelsTest.ItemTest;
+import test.ModelsTest.GameBoardTest;
+import test.ModelsTest.UserTest;
+import test.ModelsTest.WormTest;
+import test.ModelsTest.ItemTest;
 
 public class RunAllTest {
     public static void main(String[] args) {
