@@ -100,7 +100,7 @@ public class ItemTest {
         threw = false;
         try {
             item.setY(-1);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             threw = true;
         }
         check("setY(-1) throw IllegalArgumentException e", threw);
@@ -110,7 +110,7 @@ public class ItemTest {
         threw = false;
         try {
             item.setY(ROWS);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             threw = true;
         }
         check("setY(ROWS) throw IllegalArgumentException e", threw);

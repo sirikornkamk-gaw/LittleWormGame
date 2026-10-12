@@ -474,5 +474,30 @@ public class GameBoardTest {
             threw = true;
         }
         check("setIsMonthOpenFrame(0), (1), (2) is allowed", !threw);
+
+        // --- current score ---
+        System.out.println("\n--- current score ---");
+        b = new GameBoard();
+        check("initial currentScore is 0", b.getCurrentScore() == 0);
+
+        b.setCurrentScore(5);
+        check("setCurrentScore(5) changes score to 5", b.getCurrentScore() == 5);
+
+        b.setCurrentScore(0);
+        check("setCurrentScore(0) is allowed", b.getCurrentScore() == 0);
+
+        b.setCurrentScore(7);
+        threw = false;
+        try {
+            b.setCurrentScore(-1);
+        } catch (IllegalArgumentException e) {
+            threw = true;
+        }
+        check("setCurrentScore(-1) throws IllegalArgumentException", threw);
+        check("setCurrentScore(-1) score stay 7", b.getCurrentScore() == 7);
+
+        b.setCurrentScore(12);
+        b.reset();
+        check("after reset, currentScore is back to 0", b.getCurrentScore() == 0);
     }
 }
