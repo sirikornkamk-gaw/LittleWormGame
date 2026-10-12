@@ -18,7 +18,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private GameBoard gameBoard;
     private Timer timer;
     private Timer timerSpeedUp;
-    private int currentScore;
     private boolean isKeyPress;
     private int speedIncreaseCurrentTimer;
     private int speedIncreaseCooldown;
@@ -40,7 +39,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         gameBoard = new GameBoard();
         timer = new Timer(100, this);
         timerSpeedUp = new Timer(50, this);
-        currentScore = 0;
         user = new User();
         timer.start();
 
@@ -182,12 +180,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-       isKeyPress = false;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        showScore(currentScore);
+        showScore(gameBoard.getCurrentScore());
         if (e.getSource() == bPause) {
             pausePage.setVisible(true);
             gameStop();
@@ -210,10 +207,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         
         if (gameBoard.getIsEatItem()) {
             if (gameBoard.getIsEatItemType().equals("apple"))
-                currentScore++;
+                gameBoard.setCurrentScore(gameBoard.getCurrentScore() + 1);
 
             else if (gameBoard.getIsEatItemType().equals("goldApple"))
-                currentScore += 3;
+                gameBoard.setCurrentScore(gameBoard.getCurrentScore() + 3);
             
             else if (gameBoard.getIsEatItemType().equals("speedPotion"))
                     {
@@ -222,8 +219,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                         gameBoard.setIsSpeedUp(true);
                     }
             
-            else if (gameBoard.getIsEatItemType().equals("poison"))
-                currentScore--;
+            else if (gameBoard.getIsEatItemType().equals("poison") && gameBoard.getCurrentScore() > 0)
+                gameBoard.setCurrentScore(gameBoard.getCurrentScore() - 1);
 
             if (gameBoard.getAmountEatItem() != 0 && gameBoard.getAmountEatItem() % 5 == 0) {
                 gameBoard.getWorm().addTail();
@@ -263,8 +260,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         gameBoard.setIsSpeedUp(false);
         speedIncreaseCurrentTimer = 0;
         GameConfig.savedGamePanel = null;
-        if (currentScore > GameConfig.highScore)   
-            user.updateScore(GameConfig.currentUser, String.valueOf(currentScore));
+        if (gameBoard.getCurrentScore() > GameConfig.highScore)   
+            user.updateScore(GameConfig.currentUser, String.valueOf(gameBoard.getCurrentScore()));
         gameOverPage.setVisible(true);
         revalidate();
         repaint();
@@ -277,7 +274,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         speedIncreaseCurrentTimer = 0;
         GameConfig.savedGamePanel = null;
         gameWinPage.setVisible(true);
-        user.updateScore(GameConfig.currentUser, String.valueOf(currentScore));
+        user.updateScore(GameConfig.currentUser, String.valueOf(gameBoard.getCurrentScore()));
         revalidate();
         repaint();
     }
@@ -286,7 +283,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         timerSpeedUp.stop();
         gameBoard = new GameBoard();
         Body.clear();
-        currentScore = 0;
+        gameBoard.setCurrentScore(0);
 
         isKeyPress = false;
         gameBoard.setIsSpeedUp(false);
@@ -294,7 +291,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         setBody();
         currentDirection = 'D';
-        showScore(currentScore);
+        showScore(gameBoard.getCurrentScore());
 
         GameConfig.savedGamePanel = this;
         gameStart();

@@ -50,7 +50,7 @@ public class GameConfig {
     public static final String SpeedItem = "/assets/image/SpeedItem.png" ;
 
     //FilePath
-    public static final String userData = "./userData/userData.txt" ;
+    public static final String userData = "userData/userData.txt" ;
 
     public static boolean isLogin = false ;
     public static String currentUser = "" ;
