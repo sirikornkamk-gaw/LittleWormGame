@@ -182,7 +182,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-       isKeyPress = false;
     }
 
     @Override
@@ -222,7 +221,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                         gameBoard.setIsSpeedUp(true);
                     }
             
-            else if (gameBoard.getIsEatItemType().equals("poison"))
+            else if (gameBoard.getIsEatItemType().equals("poison") && currentScore > 0)
                 currentScore--;
 
             if (gameBoard.getAmountEatItem() != 0 && gameBoard.getAmountEatItem() % 5 == 0) {
