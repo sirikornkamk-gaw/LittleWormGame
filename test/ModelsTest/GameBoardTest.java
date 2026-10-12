@@ -132,7 +132,6 @@ public class GameBoardTest {
         check("initial isEatApple is false", !b.getIsEatItem());
         check("initial isEatAppleType is empty", "".equals(b.getIsEatItemType()));
         check("initial amountEatItem is 0", b.getAmountEatItem() == 0);
-        check("initial currentScore is 0", b.getCurrentScore() == 0);
         check("initial mount is closed", !b.getIsMonthOpen());
         check("board start with 8 items", b.getItems().size() == 8);
 
@@ -338,7 +337,6 @@ public class GameBoardTest {
         check("after reset, second is back to 0", b.getSecond() == 0);
         check("after reset, board has 8 items again", b.getItems().size() == 8);
         check("after reset, amountEatItem is back to 0", b.getAmountEatItem() == 0);
-        check("after reset, currentScore is back to 0", b.getCurrentScore() == 0);
         check("after reset, mouth is closed", !b.getIsMonthOpen());
         check("after reset, speed up is off", !b.getIsSpeedUp());
 
@@ -450,17 +448,6 @@ public class GameBoardTest {
             threw = true;
         }
         check("setSecond(-1) throws IllegalArgumentException", threw);
-
-        threw = false;
-        try {
-            b.setCurrentScore(-1);
-        } catch (IllegalArgumentException e) {
-            threw = true;
-        }
-        check("setCurrentScore(-1) throws IllegalArgumentException", threw);
-
-        b.setCurrentScore(5);
-        check("setCurrentScore(5) is stored", b.getCurrentScore() == 5);
 
         threw = false;
         try {

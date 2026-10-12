@@ -24,7 +24,6 @@ public class GameBoard {
     private int isMonthOpenFrame;
     private int amountEatItem;
     private boolean isSpeedUp;
-    private int currentScore;
     
     public GameBoard() {
         random = new Random();
@@ -49,7 +48,6 @@ public class GameBoard {
         isSpeedUp = false;
         setSecond(0);
         isEatItemType = "";
-        setCurrentScore(0);
         
         setGameOver(false);
         setGameWin(false);
@@ -64,7 +62,6 @@ public class GameBoard {
         assert !items.isEmpty() : "items is empty";
         assert second >= 0 : "second is negative: " + second;
         assert amountEatItem >= 0 : "amountEatItem is negative: " + amountEatItem;
-        assert currentScore >= 0 : "currentScore is negative: " + currentScore;
         // animation worm open the month. 
         // true if the worm eat item and after that 3 frame the month will close.
         // isMonthOpenFrame collect the current frame that have been pass if the frame is more than 2 worm month will close and go to false.
@@ -200,15 +197,6 @@ public class GameBoard {
     public void setAmountEatItem(int value) {
         if (value < 0) throw new IllegalArgumentException();
         this.amountEatItem = value;
-    }
-
-    public int getCurrentScore() {
-        return currentScore;
-    }
-
-    public void setCurrentScore(int value) {
-        if (value < 0) throw new IllegalArgumentException();
-        this.currentScore = value;
     }
 
     public float getSecond() {
@@ -355,7 +343,6 @@ public class GameBoard {
         isSpeedUp = false;
         setSecond(0);
         isEatItemType = "";
-        setCurrentScore(0);
         
         setGameOver(false);
         setGameWin(false);
