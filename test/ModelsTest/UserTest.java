@@ -19,7 +19,6 @@ public class UserTest {
     private static final Path DATA = Paths.get(GameConfig.userData);
     private static final Path SESSION = Paths.get(GameConfig.sessionFile);
 
-
     private static final String SEED =
             "Gong,159357,0\n" +
             "User123456,123456,52\n" +
@@ -105,7 +104,7 @@ public class UserTest {
 
         try {
             runtest();
-        } catch (Exception e) {
+        } catch (Exception | AssertionError e) {
             failed++;
             System.out.println("[FAIL] unexpected exception: " + e);
             e.printStackTrace();
