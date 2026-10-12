@@ -182,7 +182,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-       isKeyPress = false;
     }
 
     @Override
