@@ -15,35 +15,39 @@ public class SignupPanel extends JPanel implements ActionListener {
     private JButton bsignup, bquit ;
     private JTextField tUser ;
     private JPasswordField pf1, pf2 ;
-
     private User user;
+    private boolean accountJustCreated = false;
+
 
     public SignupPanel(){
         user = new User();
         
-        setLayout(new GridBagLayout());
+        setLayout(null);
         setOpaque(false);
 
         this.addMouseListener(new java.awt.event.MouseAdapter() {});
         this.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {});
         
         cardContainer = new JPanel(){
-            public void paintComponent(Graphics g){
-                super.paintComponent(g);
+        @Override
+        public void paintComponent(Graphics g){
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            double s = Math.min(getWidth() / 600.0, getHeight() / 900.0);
+            g2.scale(s, s);
 
-                Graphics2D g2 = (Graphics2D) g;
-
-                g2.setColor(GameConfig.GreenBlue);
-                g2.fillRect(0, 0, 600, 900);
-                g2.setColor(GameConfig.PinkBG);
-                g2.fillRect(5, 4, 590, 890);
-
-                AppleDrawer.RotateApple(g2, -68, 836, 235, 273, GameConfig.RedApple,14.43);
-                AppleDrawer.RotateApple(g2, 332, 810, 235, 273, GameConfig.GreenApple,-20.12);
-                AppleDrawer.RotateApple(g2, -84, 181, 93, 134, GameConfig.GreenApple,35.58);
-                AppleDrawer.RotateApple(g2, 485, -20, 93, 134, GameConfig.RedApple,-132.27);
-            }
-        };
+            g2.setColor(GameConfig.GreenBlue);
+            g2.fillRect(0, 0, 600, 900);
+            g2.setColor(GameConfig.PinkBG);
+            g2.fillRect(5, 4, 590, 890);
+            AppleDrawer.RotateApple(g2, -68, 836, 235, 273, GameConfig.RedApple,14.43);
+            AppleDrawer.RotateApple(g2, 332, 810, 235, 273, GameConfig.GreenApple,-20.12);
+            AppleDrawer.RotateApple(g2, -84, 181, 93, 134, GameConfig.GreenApple,35.58);
+            AppleDrawer.RotateApple(g2, 485, -20, 93, 134, GameConfig.RedApple,-132.27);
+            g2.dispose();
+        }
+    };
         cardContainer.setLayout(null);
         cardContainer.setPreferredSize(new Dimension(600,900));
         cardContainer.setOpaque(false);
@@ -55,12 +59,21 @@ public class SignupPanel extends JPanel implements ActionListener {
         layeredPane.setLayout(null);
         layeredPane.setPreferredSize(new Dimension(600,900));
 
-        tagwarnning = new GreenTagWarnning();
-        tagwarnning.setBounds(0, 0, 600, 900);
-        tagwarnning.setVisible(false);
 
         layeredPane.add(cardContainer, JLayeredPane.DEFAULT_LAYER);
-        layeredPane.add(tagwarnning, JLayeredPane.POPUP_LAYER);
+        tagwarnning = new GreenTagWarnning();
+        tagwarnning.setBounds(0, 0, 1920, 1080);
+        tagwarnning.setVisible(false);
+
+        tagwarnning.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentHidden(java.awt.event.ComponentEvent e) {
+                if (accountJustCreated) {
+                    accountJustCreated = false;
+                    SignupPanel.this.setVisible(false);
+                }
+            }
+        });
 
         ltitle1 = new JLabel("Little Worm") ;
         ltitle1.setForeground(GameConfig.GreenBlue);
@@ -111,19 +124,24 @@ public class SignupPanel extends JPanel implements ActionListener {
         bquit.setBackground(GameConfig.LightGreen);
         bquit.setForeground(GameConfig.PinkBG);
         bquit.setFont(FontLoader.loadFont(GameConfig.Jersey_10, 36f));
-        bquit.setBounds(24, 21, 53, 39);
+        bquit.setBounds(24, 21, 70, 39);
         bquit.setFocusPainted(false);
         cardContainer.add(bquit);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0 ;
-        gbc.gridy = 0 ;
-        gbc.anchor = GridBagConstraints.CENTER ;
-        add(layeredPane, gbc);
+        layeredPane.setBounds(660, 90, 600, 900);
+        add(layeredPane);
+        add(tagwarnning);                     
+        setComponentZOrder(tagwarnning, 0);
 
         bquit.addActionListener(this);
         bsignup.addActionListener(this);
     }
+
+    @Override
+    public boolean isOptimizedDrawingEnabled() {
+        return false;
+    }
+
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g ;
@@ -142,19 +160,18 @@ public class SignupPanel extends JPanel implements ActionListener {
             this.setVisible(false);
         } else if (e.getSource() == bsignup) {
             boolean isAccountVaild = user.isUsernameAndPasswordVaild(Username, password1);
-            if (!isAccountVaild)  
-        {
+            if (Username.length() >= 20) {
+                tagwarnning.ShowtagWarnning("Oops!", "User must\nbe <= 20 char!");
+                tagwarnning.setVisible(true);
+                return ;
+            }
+            if (!isAccountVaild) {
                 tagwarnning.ShowtagWarnning("Notice!", "Please Fill In\nAll Fields!");
                 tagwarnning.setVisible(true);
                 tagwarnning.getParent().revalidate();
                 tagwarnning.getParent().repaint();
                 return ;
             }  
-            if (Username.length() >= 20) {
-                tagwarnning.ShowtagWarnning("Oops!", "User must\nbe <= 20 char!");
-                tagwarnning.setVisible(true);
-                return ;
-            }
             if (!password1.equals(password2)) {
                 tagwarnning.ShowtagWarnning("Oops!", "Password\nDo not Match!");
                 tagwarnning.setVisible(true);
@@ -171,10 +188,10 @@ public class SignupPanel extends JPanel implements ActionListener {
                 user.createNewAccount(Username, password1);
                 tagwarnning.ShowtagWarnning("Success!", "Account Created\nSuccessfully!");
                 tagwarnning.setVisible(true);
+                accountJustCreated = true;
                 tUser.setText("");
                 pf1.setText("");
                 pf2.setText("");
-                this.setVisible(false);
             }
         }
     }

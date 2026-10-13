@@ -18,7 +18,7 @@ public class GameWinPanel extends JPanel implements ActionListener{
         super();
         this.mainFrame = mainFrame ;
         this.gamePanel = gamePanel ;
-        setLayout(new GridBagLayout());
+        setLayout(null);
         setOpaque(false);
 
         this.addMouseListener(new java.awt.event.MouseAdapter() {});
@@ -27,14 +27,17 @@ public class GameWinPanel extends JPanel implements ActionListener{
         cardContainer = new JPanel(){
             public void paintComponent(Graphics g){
                 super.paintComponent(g);
-
-                Graphics2D g2 = (Graphics2D) g;
-
+                Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                double s = Math.min(getWidth() / 600.0, getHeight() / 700.0);
+                g2.scale(s, s);
+
                 g2.setColor(GameConfig.Beige);
                 g2.fillRoundRect(10, 15, 580, 680, 100, 100);
                 g2.setColor(GameConfig.Yellow);
                 g2.fillRoundRect(27, 51, 543, 260, 50, 50);
+                g2.dispose();
                 
             }
         };
@@ -47,8 +50,7 @@ public class GameWinPanel extends JPanel implements ActionListener{
 
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setLayout(null);
-        layeredPane.setPreferredSize(new Dimension(600,900));
-
+        layeredPane.setBounds(660, 190, 600, 700);
         layeredPane.add(cardContainer, JLayeredPane.DEFAULT_LAYER);
 
         ltitle = new JLabel("Yummy!") ;
@@ -80,11 +82,7 @@ public class GameWinPanel extends JPanel implements ActionListener{
         bquit.setFocusPainted(false);
         cardContainer.add(bquit);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0 ;
-        gbc.gridy = 0 ;
-        gbc.anchor = GridBagConstraints.CENTER ;
-        add(layeredPane, gbc);
+        add(layeredPane);
 
         bplayagain.addActionListener(this);
         bquit.addActionListener(this);

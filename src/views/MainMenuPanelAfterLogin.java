@@ -27,25 +27,19 @@ public class MainMenuPanelAfterLogin extends  JPanel implements ActionListener{
         
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setLayout(null);
+        layeredPane.setBounds(0, 0, 1920, 1080);     // เพิ่ม
 
         tagWarnning = new GreenTagWarnning();
+        tagWarnning.setBounds(0, 0, 1920, 1080);     // เพิ่ม
         tagWarnning.setVisible(false);
         layeredPane.add(tagWarnning, JLayeredPane.POPUP_LAYER);
 
         noLoginWarnnig = new pinkTagWarnning();
+        noLoginWarnnig.setBounds(0, 0, 1920, 1080);  // เพิ่ม
         noLoginWarnnig.setVisible(false);
         layeredPane.add(noLoginWarnnig, JLayeredPane.POPUP_LAYER);
         add(layeredPane);
-        this.addComponentListener(new java.awt.event.ComponentAdapter() {
-        @Override
-        public void componentResized(java.awt.event.ComponentEvent e) {
-            layeredPane.setBounds(0, 0, getWidth(), getHeight());
-            tagWarnning.setBounds(0, 0, getWidth(), getHeight());
-            noLoginWarnnig.setBounds(0, 0, getWidth(), getHeight());
-            revalidate();
-            }
-        });
-        
+
         ltitle1 = new JLabel("Little Worm") ;
         ltitle1.setForeground(GameConfig.Beige);
         ltitle1.setFont(FontLoader.loadFont(GameConfig.Irish_Grover, 128f));
@@ -91,26 +85,17 @@ public class MainMenuPanelAfterLogin extends  JPanel implements ActionListener{
         lscore = new JLabel() ;
         lscore.setForeground(GameConfig.White);
         lscore.setFont(FontLoader.loadFont(GameConfig.Jersey_10, 128f));
-        lscore.setBounds(310, 915, 450, 60);
+        lscore.setBounds(310, 915, 500, 60);
         add(lscore);
 
-        int paddingRight = 60 ;
 
 
         luserN = new JLabel() ;
         luserN.setForeground(GameConfig.White);
         luserN.setFont(FontLoader.loadFont(GameConfig.Jersey_10, 64f));
         luserN.setHorizontalAlignment(SwingConstants.RIGHT);
+        luserN.setBounds(0, 24, 1860, 70);           // 1920 - 60
         add(luserN);
-
-        this.addComponentListener(new java.awt.event.ComponentAdapter() {
-        @Override
-            public void componentResized(java.awt.event.ComponentEvent e) {
-                int actualWidth = getWidth(); 
-                int labelWidth = actualWidth - paddingRight;
-                luserN.setBounds(0, 24, labelWidth, 70);
-            }
-        });
 
         bstart.addActionListener(this);
         bcon.addActionListener(this);
@@ -125,8 +110,11 @@ public class MainMenuPanelAfterLogin extends  JPanel implements ActionListener{
 
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
+        Graphics2D g2 = (Graphics2D) g.create();
+        double s = Math.min(getWidth() / 1920.0, getHeight() / 1080.0);
+        g2.scale(s, s);
         MenuClover.drawClover(g2);
+        g2.dispose();
     }
 
     public void showHighScore(String highScore){
@@ -159,9 +147,9 @@ public class MainMenuPanelAfterLogin extends  JPanel implements ActionListener{
         }else if (e.getSource() == bcon) {
             GamePanel gamePanel = GameConfig.savedGamePanel ;
             if (gamePanel == null) {
-                gamePanel = new GamePanel(this.mainFrame);
+            gamePanel = new GamePanel(this.mainFrame);
             } else {
-                gamePanel.resumeGame();
+            gamePanel.resumeGame();
             }
             mainFrame.switchView(gamePanel);
         }

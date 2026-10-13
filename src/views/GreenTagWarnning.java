@@ -11,47 +11,57 @@ public class GreenTagWarnning extends JPanel {
 
     public GreenTagWarnning(){
         setOpaque(false);
-        setLayout(new GridBagLayout());
+        setLayout(null);
         JPanel cardContaiPanel = new JPanel(){
             public void paintComponent(Graphics g){
                 super.paintComponent(g);
-                Graphics2D g2 = (Graphics2D) g ;
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                double s = Math.min(getWidth() / 500.0, getHeight() / 400.0);
+                g2.scale(s, s);
+
                 g2.setColor(GameConfig.GreenBlue);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 100, 100);
+                g2.fillRoundRect(0, 0, 500, 400, 100, 100);
                 g2.setColor(GameConfig.LightGreen);
                 g2.fillRoundRect(10, 8, 480, 380, 100, 100);
+                g2.dispose();
             }
         };
 
         cardContaiPanel.setOpaque(false);
-        cardContaiPanel.setPreferredSize(new Dimension(500,400));
-        cardContaiPanel.setLayout(new BorderLayout(15,25));
-        cardContaiPanel.setBorder(BorderFactory.createEmptyBorder(30, 25, 30, 25));
+        cardContaiPanel.setLayout(null);
+        cardContaiPanel.setBounds(710, 340, 500, 400);
 
         JPanel headpanel = new JPanel(){
+            @Override
             public void paintComponent(Graphics g){
                 super.paintComponent(g);
-                Graphics2D g2 = (Graphics2D) g ;
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                double s = Math.min(getWidth() / 450.0, getHeight() / 185.0);
+                g2.scale(s, s);
+
                 g2.setColor(GameConfig.PinkBG);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 50, 50);
+                g2.fillRoundRect(0, 0, 450, 185, 50, 50);
+                g2.dispose();
             }
         };
         headpanel.setOpaque(false);
-        headpanel.setPreferredSize(new Dimension(450,185));
-        headpanel.setLayout(new GridBagLayout());
+        headpanel.setLayout(null);
+        headpanel.setBounds(25, 30, 450, 185);
+        cardContaiPanel.add(headpanel);
 
-        ltitle = new JLabel() ;
+        ltitle = new JLabel("", SwingConstants.CENTER);
         ltitle.setForeground(GameConfig.GreenBlue);
         ltitle.setFont(FontLoader.loadFont(GameConfig.Jersey_10, 110f));
+        ltitle.setBounds(0, 0, 450, 185);
         headpanel.add(ltitle);
 
-        lmessage = new JLabel() ;
+        lmessage = new JLabel("", SwingConstants.CENTER);
         lmessage.setForeground(GameConfig.GreenBlue);
         lmessage.setFont(FontLoader.loadFont(GameConfig.Jersey_10, 48f));
-        lmessage.setHorizontalAlignment(SwingConstants.CENTER);
-
-        cardContaiPanel.add(headpanel, BorderLayout.NORTH);
-        cardContaiPanel.add(lmessage,BorderLayout.CENTER);
+        lmessage.setBounds(25, 240, 450, 130);
+        cardContaiPanel.add(lmessage);
 
         add(cardContaiPanel) ;
         addMouseListener(new MouseListener() {
@@ -76,11 +86,8 @@ public class GreenTagWarnning extends JPanel {
     }
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g ;
-
-        Color dimColor = new Color(0, 0, 0, 150);
-        g2.setColor(dimColor);
-        g2.fillRect(0, 0, getWidth(), getHeight());
+        g.setColor(new Color(0, 0, 0, 150));
+        g.fillRect(0, 0, getWidth(), getHeight());
     }
 
     public void ShowtagWarnning(String title, String message){

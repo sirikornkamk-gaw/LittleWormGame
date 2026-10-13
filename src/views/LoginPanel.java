@@ -25,7 +25,7 @@ public class LoginPanel extends JPanel implements ActionListener {
         user = new User();
         this.mainFrame = mainFrame ;
         this.signupPage = signupPage;
-        setLayout(new GridBagLayout());
+        setLayout(null);
         setOpaque(false);
 
         this.addMouseListener(new java.awt.event.MouseAdapter() {});
@@ -34,10 +34,15 @@ public class LoginPanel extends JPanel implements ActionListener {
         
 
         cardContainer = new JPanel(){
+            @Override
             public void paintComponent(Graphics g){
                 super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                Graphics2D g2 = (Graphics2D) g;
+                double s = Math.min(getWidth() / 600.0, getHeight() / 900.0);
+                g2.scale(s, s);                     // วาดด้วยพิกัด 600x900 เหมือนเดิม
+
                 g2.setColor(GameConfig.GreenBlue);
                 g2.fillRect(0, 0, 600, 900);
                 g2.setColor(GameConfig.PinkBG);
@@ -46,6 +51,7 @@ public class LoginPanel extends JPanel implements ActionListener {
                 AppleDrawer.RotateApple(g2, 332, 810, 235, 273, GameConfig.GreenApple,-20.12);
                 AppleDrawer.RotateApple(g2, -84, 181, 93, 134, GameConfig.GreenApple,35.58);
                 AppleDrawer.RotateApple(g2, 485, -20, 93, 134, GameConfig.RedApple,-132.27);
+                g2.dispose();
             }
         };
         cardContainer.setLayout(null);
@@ -57,20 +63,11 @@ public class LoginPanel extends JPanel implements ActionListener {
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setLayout(null);
         layeredPane.setPreferredSize(new Dimension(600,900));
-
-        tagwarnning = new GreenTagWarnning();
-        tagwarnning.setBounds(0, 0, 600, 900);
-        tagwarnning.setVisible(false);
-
-        signupPage = new SignupPanel();
-        signupPage.setVisible(false);
-        signupPage.setBounds(0, 0, 600, 900);
-
-        
         
         layeredPane.add(cardContainer, JLayeredPane.DEFAULT_LAYER);
-        layeredPane.add(tagwarnning, JLayeredPane.POPUP_LAYER);
-        layeredPane.add(signupPage, JLayeredPane.POPUP_LAYER);
+        tagwarnning = new GreenTagWarnning();
+        tagwarnning.setBounds(0, 0, 1920, 1080);
+        tagwarnning.setVisible(false);
 
         ltitle1 = new JLabel("Little Worm") ;
         ltitle1.setForeground(GameConfig.GreenBlue);
@@ -129,7 +126,7 @@ public class LoginPanel extends JPanel implements ActionListener {
         bquit.setBackground(GameConfig.LightGreen);
         bquit.setForeground(GameConfig.PinkBG);
         bquit.setFont(FontLoader.loadFont(GameConfig.Jersey_10, 36f));
-        bquit.setBounds(24, 21, 53, 39);
+        bquit.setBounds(24, 21, 70, 39);
         bquit.setFocusPainted(false);
         cardContainer.add(bquit);
 
@@ -138,13 +135,10 @@ public class LoginPanel extends JPanel implements ActionListener {
         bsignup.addActionListener(this);
 
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0 ;
-        gbc.gridy = 0 ;
-        gbc.anchor = GridBagConstraints.CENTER ;
-        add(layeredPane, gbc);
-
-        
+        layeredPane.setBounds(660, 90, 600, 900);
+        add(layeredPane);
+        add(tagwarnning);                     
+        setComponentZOrder(tagwarnning, 0);
     }
     public void paintComponent(Graphics g){
         super.paintComponent(g);
@@ -190,6 +184,8 @@ public class LoginPanel extends JPanel implements ActionListener {
         }else if (e.getSource() == bsignup) {
             this.setVisible(false);
             signupPage.setVisible(true);
+            signupPage.getParent().revalidate();
+            signupPage.getParent().repaint();
         }
 
     }
