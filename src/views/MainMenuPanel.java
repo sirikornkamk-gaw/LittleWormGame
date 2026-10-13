@@ -17,35 +17,28 @@ public class MainMenuPanel extends JPanel implements ActionListener{
 
     public MainMenuPanel(MainFrame mainFrame){
         this.mainFrame = mainFrame ;
-        setLayout(new BorderLayout());
+        setLayout(null);                               
         setBackground(GameConfig.LightGreen);
 
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setLayout(null);
+        layeredPane.setBounds(0, 0, 1920, 1080);          
 
         noLoginWarnnig = new pinkTagWarnning();
+        noLoginWarnnig.setBounds(0, 0, 1920, 1080);       
         noLoginWarnnig.setVisible(false);
         layeredPane.add(noLoginWarnnig, JLayeredPane.POPUP_LAYER);
 
         signupPage = new SignupPanel();
+        signupPage.setBounds(0, 0, 1920, 1080);
         signupPage.setVisible(false);
         layeredPane.add(signupPage, JLayeredPane.POPUP_LAYER);
 
-        loginPage = new LoginPanel(this.mainFrame,this.signupPage);
+        loginPage = new LoginPanel(this.mainFrame, this.signupPage);
+        loginPage.setBounds(0, 0, 1920, 1080);
         loginPage.setVisible(false);
         layeredPane.add(loginPage, JLayeredPane.DRAG_LAYER);
-
         
-        this.addComponentListener(new java.awt.event.ComponentAdapter() {
-        @Override
-        public void componentResized(java.awt.event.ComponentEvent e) {
-            layeredPane.setBounds(0, 0, getWidth(), getHeight());
-            noLoginWarnnig.setBounds(0, 0, getWidth(), getHeight());
-            loginPage.setBounds(0, 0, getWidth(), getHeight());
-            signupPage.setBounds(0, 0, getWidth(), getHeight());
-            revalidate();
-            }
-        });
         
         ltitle1 = new JLabel("Little Worm") ;
         ltitle1.setForeground(GameConfig.Beige);
@@ -83,19 +76,23 @@ public class MainMenuPanel extends JPanel implements ActionListener{
         bsignup.setFocusPainted(false);
         layeredPane.add(bsignup);
 
-        add(layeredPane, BorderLayout.CENTER);
+        add(layeredPane);
 
         bstart.addActionListener(this);
         blogin.addActionListener(this);
         bsignup.addActionListener(this);
     }
 
+    @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
+        Graphics2D g2 = (Graphics2D) g.create();
+        double s = Math.min(getWidth() / 1920.0, getHeight() / 1080.0);
+        g2.scale(s, s);
         MenuClover.drawClover(g2);
-        
+        g2.dispose();
     }
+    
 
     @Override
     public void actionPerformed(ActionEvent e) {

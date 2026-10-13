@@ -48,38 +48,33 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         speedIncreaseCooldown = 10;
 
         this.mainFrame = mainFrame ;
-        setLayout(new BorderLayout());
+        setLayout(null);
         setBackground(GameConfig.PinkBG);
 
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setLayout(null);
+        layeredPane.setBounds(0, 0, 1920, 1080);
 
-        pausePage = new PausePanel(this.mainFrame,this);
+        pausePage = new PausePanel(this.mainFrame, this);
+        pausePage.setBounds(0, 0, 1920, 1080);
         pausePage.setVisible(false);
         layeredPane.add(pausePage, JLayeredPane.POPUP_LAYER);
 
-        gameOverPage = new GameOverPanel(this.mainFrame,this);
+        gameOverPage = new GameOverPanel(this.mainFrame, this);
+        gameOverPage.setBounds(0, 0, 1920, 1080);
         gameOverPage.setVisible(false);
         layeredPane.add(gameOverPage, JLayeredPane.POPUP_LAYER);
 
-        gameWinPage = new GameWinPanel(this.mainFrame,this);
+        gameWinPage = new GameWinPanel(this.mainFrame, this);
+        gameWinPage.setBounds(0, 0, 1920, 1080);
         gameWinPage.setVisible(false);
         layeredPane.add(gameWinPage, JLayeredPane.POPUP_LAYER);
 
-        this.addComponentListener(new java.awt.event.ComponentAdapter() {
-        @Override
-        public void componentResized(java.awt.event.ComponentEvent e) {
-            layeredPane.setBounds(0, 0, getWidth(), getHeight());
-            pausePage.setBounds(0, 0, getWidth(), getHeight());
-            gameOverPage.setBounds(0, 0, getWidth(), getHeight());
-            gameWinPage.setBounds(0, 0, getWidth(), getHeight());
-            }
-        });
 
         lscore = new JLabel("0000") ;
         lscore.setForeground(GameConfig.DarkerGreen);
         lscore.setFont(FontLoader.loadFont(GameConfig.Jersey_10, 96f));
-        lscore.setBounds(190, 50, 150, 80);
+        lscore.setBounds(190, 50, 200, 80);
         layeredPane.add(lscore);
 
         bPause = new RoundedButton("Pause", 50) ;
@@ -95,7 +90,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         gameReset();
 
-        add(layeredPane, BorderLayout.CENTER);
+        add(layeredPane);
         bPause.addActionListener(this);
 
         setFocusable(true);
@@ -111,7 +106,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g ;
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        double s = Math.min(getWidth() / 1920.0, getHeight() / 1080.0);
+        g2.scale(s, s);
+
         g2.setColor(GameConfig.Beige);
         g2.fillRoundRect(80, 30, 281, 114, 50, 50);
         AppleDrawer.drawApple(g2, 110, 65, 41, 53, GameConfig.RedApple);
@@ -141,6 +141,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             if (thisItem.getType() == "poison")
                 ItemDrawer.drawPoisonItem(g2, (thisItem.getX() * tileSize) + 100, (thisItem.getY() * tileSize) + 181, 41, 53);
         }
+        g2.dispose();
     }
 
     public void showScore(int score){
@@ -245,12 +246,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     public void resumeGame() {
-        pausePage.setVisible(false);
+        pausePage.setVisible(true);
         gameOverPage.setVisible(false);
         gameWinPage.setVisible(false);
+        gameStop();
         revalidate();
         repaint();
-        gameStart();
         requestFocusInWindow();
     }
 
